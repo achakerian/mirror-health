@@ -34,11 +34,16 @@ jobs:
         run: |
           git config user.name "mirror-health-bot"
           git config user.email "mirror-health-bot@users.noreply.github.com"
+          cp data/mirror_state.json /tmp/mirror_state.json
+          cp data/mirror_scores.json /tmp/mirror_scores.json
+          git fetch origin main
+          git reset --hard origin/main
+          cp /tmp/mirror_state.json data/mirror_state.json
+          cp /tmp/mirror_scores.json data/mirror_scores.json
           git add data/
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
             git commit -m "chore(data): update mirror health [active_check]"
-            git pull --rebase -X theirs origin main
             git push
           fi
