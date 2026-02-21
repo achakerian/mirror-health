@@ -1,0 +1,28 @@
+name: Smoke Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+
+      - name: Run tests
+        run: pytest -v --tb=short
+
+      - name: Verify config loads
+        run: python -c "from src.scoring import load_scoring_config; from src.state import load_known_domains; load_scoring_config(); load_known_domains(); print('Config OK')"
+
+      - name: Dry-run active check (no mirrors yet = instant)
+        run: python -m src.main active
