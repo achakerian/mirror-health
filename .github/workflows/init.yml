@@ -1,0 +1,51 @@
+name: Initial Setup
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: mirror-health-data
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  init:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -e .
+
+      - name: Run discovery (bootstrap + find mirrors)
+        run: python -m src.main discovery
+
+      - name: Active check pass 1 of 3
+        run: python -m src.main active
+
+      - name: Active check pass 2 of 3
+        run: python -m src.main active
+
+      - name: Active check pass 3 of 3
+        run: python -m src.main active
+
+      - name: Commit and push results
+        run: |
+          git config user.name "mirror-health-bot"
+          git config user.email "mirror-health-bot@users.noreply.github.com"
+          git add data/
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore(data): initial mirror population [init]"
+            git pull --rebase origin main
+            git push
+          fi

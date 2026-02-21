@@ -5,7 +5,7 @@ import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
-from .models import MirrorState, ScoreEntry, ScoresOutput, Tier
+from .models import Mirror, MirrorState, ScoreEntry, ScoresOutput, Tier
 from .scoring import normalize_score
 from .utils import logger
 
@@ -61,6 +61,32 @@ def load_known_domains(path: Path | None = None) -> dict[str, list[str]]:
     if path is None:
         path = CONFIG_DIR / "known_domains.json"
     return json.loads(path.read_text())
+
+
+def bootstrap_state(state: MirrorState, path: Path | None = None) -> int:
+    """Seed mirrors from config/seed_mirrors.json if not already tracked.
+
+    Returns the number of newly added mirrors.
+    """
+    if path is None:
+        path = CONFIG_DIR / "seed_mirrors.json"
+    if not path.exists():
+        return 0
+
+    seed_data: dict[str, list[str]] = json.loads(path.read_text())
+    existing_urls = {m.url for m in state.mirrors}
+    added = 0
+
+    for scraper_name, urls in seed_data.items():
+        for url in urls:
+            url = url.rstrip("/")
+            if url not in existing_urls:
+                state.mirrors.append(Mirror(url=url, scraper=scraper_name))
+                existing_urls.add(url)
+                added += 1
+                logger.info("Bootstrap: added seed mirror %s [%s]", url, scraper_name)
+
+    return added
 
 
 def generate_scores(state: MirrorState, scoring_config: dict) -> ScoresOutput:

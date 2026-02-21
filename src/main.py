@@ -20,6 +20,7 @@ from .discovery import discover_mirrors
 from .models import CheckHistory7d, Mirror, MirrorState, Tier
 from .scoring import load_scoring_config, normalize_score, update_elo
 from .state import (
+    bootstrap_state,
     load_known_domains,
     load_state,
     save_scores,
@@ -295,8 +296,11 @@ def main() -> None:
     tlds = _load_config_file(CONFIG_DIR / "tlds.json")
     scoring_config = load_scoring_config()
 
-    # Load state
+    # Load state and bootstrap seed mirrors
     state = load_state()
+    added = bootstrap_state(state)
+    if added:
+        logger.info("Bootstrapped %d seed mirrors", added)
     logger.info("Loaded state with %d mirrors", len(state.mirrors))
 
     # Store refs for signal handler
