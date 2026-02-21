@@ -1,0 +1,23 @@
+{
+  "status": "ok",
+  "status_message": "Query was successful",
+  "data": {
+    "movie_count": 56894,
+    "limit": 1,
+    "page_number": 1,
+    "movies": [
+      {
+        "id": 12345,
+        "url": "https://yts.mx/movies/example-2024",
+        "imdb_code": "tt1234567",
+        "title": "Example Movie",
+        "year": 2024,
+        "rating": 7.5,
+        "runtime": 120,
+        "genres": ["Action", "Drama"],
+        "language": "en",
+        "state": "ok"
+      }
+    ]
+  }
+}

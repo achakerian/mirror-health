@@ -1,0 +1,44 @@
+{
+  "yts": {
+    "name": "YTS",
+    "fingerprint_type": "json_api",
+    "fingerprint_path": "/api/v2/list_movies.json?limit=1",
+    "fingerprint_check": ["data", "movies"]
+  },
+  "1337x": {
+    "name": "1337x",
+    "fingerprint_type": "html_contains",
+    "fingerprint_path": "/",
+    "fingerprint_check": "table-list"
+  },
+  "tpb": {
+    "name": "TPB",
+    "fingerprint_type": "html_contains_any",
+    "fingerprint_path": "/",
+    "fingerprint_check": ["detLink", "searchResult"]
+  },
+  "torrentgalaxy": {
+    "name": "TorrentGalaxy",
+    "fingerprint_type": "html_contains",
+    "fingerprint_path": "/",
+    "fingerprint_check": "tgxtablerow"
+  },
+  "eztv": {
+    "name": "EZTV",
+    "fingerprint_type": "html_contains",
+    "fingerprint_path": "/",
+    "fingerprint_check": "forum_header_border"
+  },
+  "annas_archive": {
+    "name": "Anna's Archive",
+    "fingerprint_type": "html_contains",
+    "fingerprint_path": "/search?q=test",
+    "fingerprint_check": "js-vim-focus"
+  },
+  "rutracker": {
+    "name": "RuTracker",
+    "fingerprint_type": "html_contains",
+    "fingerprint_path": "/",
+    "fingerprint_check": "f-name"
+  }
+}
