@@ -115,7 +115,7 @@ def generate_scores(state: MirrorState, scoring_config: dict) -> ScoresOutput:
     for scraper in scrapers:
         scrapers[scraper].sort(key=lambda e: e.elo, reverse=True)
 
-    return ScoresOutput(generated_at=now, scrapers=scrapers)
+    return ScoresOutput(generated_at=now, runner_geo=state.runner_geo, scrapers=scrapers)
 
 
 def save_scores(state: MirrorState, scoring_config: dict, path: Path = SCORES_PATH) -> None:

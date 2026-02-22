@@ -47,8 +47,18 @@ class Mirror(BaseModel):
     response_times: list[float] = Field(default_factory=list)
 
 
+class RunnerGeo(BaseModel):
+    ip: Optional[str] = None
+    city: Optional[str] = None
+    region: Optional[str] = None
+    country: Optional[str] = None
+    org: Optional[str] = None
+    timezone: Optional[str] = None
+
+
 class MirrorState(BaseModel):
     generated_at: Optional[datetime] = None
+    runner_geo: Optional[RunnerGeo] = None
     mirrors: list[Mirror] = Field(default_factory=list)
 
 
@@ -67,4 +77,5 @@ class ScoreEntry(BaseModel):
 
 class ScoresOutput(BaseModel):
     generated_at: Optional[datetime] = None
+    runner_geo: Optional[RunnerGeo] = None
     scrapers: dict[str, list[ScoreEntry]] = Field(default_factory=dict)

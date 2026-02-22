@@ -2,7 +2,7 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
-from src.models import Mirror, MirrorState, Tier
+from src.models import Mirror, MirrorState, RunnerGeo, Tier
 from src.state import generate_scores, load_state, save_scores, save_state
 
 from .conftest import SCORING_CONFIG
@@ -133,6 +133,22 @@ class TestGenerateScores:
         state = MirrorState(mirrors=mirrors)
         output = generate_scores(state, SCORING_CONFIG)
         assert output.scrapers == {}
+
+    def test_propagates_runner_geo(self):
+        geo = RunnerGeo(ip="1.2.3.4", city="Ashburn", country="US")
+        mirrors = [
+            Mirror(url="https://a.com", scraper="s1", tier=Tier.ALIVE, elo=1200),
+        ]
+        state = MirrorState(mirrors=mirrors, runner_geo=geo)
+        output = generate_scores(state, SCORING_CONFIG)
+        assert output.runner_geo is not None
+        assert output.runner_geo.ip == "1.2.3.4"
+        assert output.runner_geo.city == "Ashburn"
+
+    def test_none_runner_geo_propagated(self):
+        state = MirrorState(mirrors=[], runner_geo=None)
+        output = generate_scores(state, SCORING_CONFIG)
+        assert output.runner_geo is None
 
 
 class TestSaveScores:

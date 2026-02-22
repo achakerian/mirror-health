@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from src.models import CheckHistory7d, Mirror, MirrorState, ScoreEntry, ScoresOutput, Tier
+from src.models import CheckHistory7d, Mirror, MirrorState, RunnerGeo, ScoreEntry, ScoresOutput, Tier
 
 
 class TestTier:
@@ -92,11 +92,38 @@ class TestCheckHistory7d:
         assert passed / total == 11 / 12
 
 
+class TestRunnerGeo:
+    def test_all_fields(self):
+        geo = RunnerGeo(
+            ip="1.2.3.4",
+            city="Ashburn",
+            region="Virginia",
+            country="US",
+            org="AS8075 Microsoft Corporation",
+            timezone="America/New_York",
+        )
+        assert geo.ip == "1.2.3.4"
+        assert geo.country == "US"
+
+    def test_defaults_to_none(self):
+        geo = RunnerGeo()
+        assert geo.ip is None
+        assert geo.city is None
+
+    def test_json_round_trip(self):
+        geo = RunnerGeo(ip="1.2.3.4", city="Ashburn", country="US")
+        json_str = geo.model_dump_json()
+        geo2 = RunnerGeo.model_validate_json(json_str)
+        assert geo2.ip == "1.2.3.4"
+        assert geo2.city == "Ashburn"
+
+
 class TestMirrorState:
     def test_empty(self):
         state = MirrorState()
         assert state.mirrors == []
         assert state.generated_at is None
+        assert state.runner_geo is None
 
     def test_json_round_trip(self):
         now = datetime.now(timezone.utc)
@@ -107,6 +134,20 @@ class TestMirrorState:
         assert len(state2.mirrors) == 1
         assert state2.mirrors[0].url == "https://example.com"
         assert state2.generated_at is not None
+
+    def test_backward_compat_without_runner_geo(self):
+        """JSON without runner_geo loads fine (defaults to None)."""
+        raw = '{"generated_at": null, "mirrors": []}'
+        state = MirrorState.model_validate_json(raw)
+        assert state.runner_geo is None
+
+    def test_with_runner_geo(self):
+        geo = RunnerGeo(ip="1.2.3.4", city="Ashburn", country="US")
+        state = MirrorState(runner_geo=geo, mirrors=[])
+        json_str = state.model_dump_json()
+        state2 = MirrorState.model_validate_json(json_str)
+        assert state2.runner_geo is not None
+        assert state2.runner_geo.ip == "1.2.3.4"
 
 
 class TestScoresOutput:
@@ -129,3 +170,20 @@ class TestScoresOutput:
         assert "yts" in output2.scrapers
         assert output2.scrapers["yts"][0].url == "https://yts.mx"
         assert output2.scrapers["yts"][0].tier == "GOAT"
+
+    def test_runner_geo_included(self):
+        geo = RunnerGeo(ip="1.2.3.4", city="Ashburn", country="US")
+        output = ScoresOutput(
+            generated_at=datetime.now(timezone.utc),
+            runner_geo=geo,
+            scrapers={},
+        )
+        json_str = output.model_dump_json()
+        output2 = ScoresOutput.model_validate_json(json_str)
+        assert output2.runner_geo is not None
+        assert output2.runner_geo.ip == "1.2.3.4"
+
+    def test_backward_compat_without_runner_geo(self):
+        raw = '{"generated_at": null, "scrapers": {}}'
+        output = ScoresOutput.model_validate_json(raw)
+        assert output.runner_geo is None

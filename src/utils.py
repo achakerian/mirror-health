@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import random
+from typing import Optional
 
 logger = logging.getLogger("mirror-health")
 
@@ -63,6 +64,35 @@ def detect_cloudflare(html: str) -> bool:
 def detect_placeholder(html: str) -> bool:
     lower = html.lower()
     return any(m in lower for m in PLACEHOLDER_MARKERS)
+
+
+def fetch_runner_geo() -> Optional["RunnerGeo"]:  # noqa: F821
+    """Fetch geolocation of the current runner from ipinfo.io.
+
+    Best-effort: returns None on any failure so the run proceeds normally.
+    """
+    import httpx
+
+    from .models import RunnerGeo
+
+    try:
+        with httpx.Client(timeout=5.0) as client:
+            resp = client.get("https://ipinfo.io/json")
+            resp.raise_for_status()
+            data = resp.json()
+        geo = RunnerGeo(
+            ip=data.get("ip"),
+            city=data.get("city"),
+            region=data.get("region"),
+            country=data.get("country"),
+            org=data.get("org"),
+            timezone=data.get("timezone"),
+        )
+        logger.info("Runner geo: %s, %s, %s", geo.city, geo.region, geo.country)
+        return geo
+    except Exception as e:
+        logger.warning("Failed to fetch runner geo: %s", e)
+        return None
 
 
 def setup_logging(level: str = "INFO") -> None:

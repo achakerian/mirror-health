@@ -27,7 +27,7 @@ from .state import (
     save_state,
 )
 from .tiers import evaluate_tier_transition
-from .utils import logger, random_delay, setup_logging
+from .utils import fetch_runner_geo, logger, random_delay, setup_logging
 
 CONFIG_DIR = Path(__file__).resolve().parent.parent / "config"
 
@@ -302,6 +302,9 @@ def main() -> None:
     if added:
         logger.info("Bootstrapped %d seed mirrors", added)
     logger.info("Loaded state with %d mirrors", len(state.mirrors))
+
+    # Geo-locate the runner (best-effort)
+    state.runner_geo = fetch_runner_geo()
 
     # Store refs for signal handler
     _current_state = state
