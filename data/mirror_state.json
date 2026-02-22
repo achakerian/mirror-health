@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-02-22T04:14:26.796665Z",
+  "generated_at": "2026-02-22T04:50:02.951931Z",
   "mirrors": [
     {
       "url": "https://yts.to",
@@ -3482,6 +3482,33 @@
         1777.6770860000113,
         1198.756093
       ]
+    },
+    {
+      "url": "https://thepiratebay.cc",
+      "scraper": "tpb",
+      "tier": "Candidate",
+      "fallen_comrade": false,
+      "elo": 1000.0,
+      "score": 0.4,
+      "avg_response_ms": 0.0,
+      "consecutive_fails": 0,
+      "consecutive_passes": 0,
+      "total_checks": 0,
+      "total_passes": 0,
+      "last_checked": null,
+      "last_passed": null,
+      "last_failed": null,
+      "first_seen": "2026-02-22T04:48:03.271523Z",
+      "cloudflare_detected": false,
+      "last_failure_reason": null,
+      "check_history_7d": {
+        "basic_total": 0,
+        "basic_passed": 0,
+        "full_total": 0,
+        "full_passed": 0,
+        "window_start": null
+      },
+      "response_times": []
     }
   ]
 }
