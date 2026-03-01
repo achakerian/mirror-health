@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-03-01T04:27:00.521958Z",
+  "generated_at": "2026-03-01T04:54:23.713957Z",
   "runner_geo": {
-    "ip": "57.151.138.2",
+    "ip": "172.208.152.208",
     "city": "Cheyenne",
     "region": "Wyoming",
     "country": "US",
@@ -3590,6 +3590,114 @@
         503.7948229999927,
         216.67208899998514
       ]
+    },
+    {
+      "url": "https://yify.org",
+      "scraper": "yts",
+      "tier": "Candidate",
+      "fallen_comrade": false,
+      "elo": 1000.0,
+      "score": 0.4,
+      "avg_response_ms": 0.0,
+      "consecutive_fails": 0,
+      "consecutive_passes": 0,
+      "total_checks": 0,
+      "total_passes": 0,
+      "last_checked": null,
+      "last_passed": null,
+      "last_failed": null,
+      "first_seen": "2026-03-01T04:53:23.422618Z",
+      "cloudflare_detected": false,
+      "last_failure_reason": null,
+      "check_history_7d": {
+        "basic_total": 0,
+        "basic_passed": 0,
+        "full_total": 0,
+        "full_passed": 0,
+        "window_start": null
+      },
+      "response_times": []
+    },
+    {
+      "url": "https://yify.net",
+      "scraper": "yts",
+      "tier": "Candidate",
+      "fallen_comrade": false,
+      "elo": 1000.0,
+      "score": 0.4,
+      "avg_response_ms": 0.0,
+      "consecutive_fails": 0,
+      "consecutive_passes": 0,
+      "total_checks": 0,
+      "total_passes": 0,
+      "last_checked": null,
+      "last_passed": null,
+      "last_failed": null,
+      "first_seen": "2026-03-01T04:53:25.776351Z",
+      "cloudflare_detected": false,
+      "last_failure_reason": null,
+      "check_history_7d": {
+        "basic_total": 0,
+        "basic_passed": 0,
+        "full_total": 0,
+        "full_passed": 0,
+        "window_start": null
+      },
+      "response_times": []
+    },
+    {
+      "url": "https://thepiratebay.me",
+      "scraper": "tpb",
+      "tier": "Candidate",
+      "fallen_comrade": false,
+      "elo": 1000.0,
+      "score": 0.4,
+      "avg_response_ms": 0.0,
+      "consecutive_fails": 0,
+      "consecutive_passes": 0,
+      "total_checks": 0,
+      "total_passes": 0,
+      "last_checked": null,
+      "last_passed": null,
+      "last_failed": null,
+      "first_seen": "2026-03-01T04:52:27.242193Z",
+      "cloudflare_detected": false,
+      "last_failure_reason": null,
+      "check_history_7d": {
+        "basic_total": 0,
+        "basic_passed": 0,
+        "full_total": 0,
+        "full_passed": 0,
+        "window_start": null
+      },
+      "response_times": []
+    },
+    {
+      "url": "https://thepiratebay.live",
+      "scraper": "tpb",
+      "tier": "Candidate",
+      "fallen_comrade": false,
+      "elo": 1000.0,
+      "score": 0.4,
+      "avg_response_ms": 0.0,
+      "consecutive_fails": 0,
+      "consecutive_passes": 0,
+      "total_checks": 0,
+      "total_passes": 0,
+      "last_checked": null,
+      "last_passed": null,
+      "last_failed": null,
+      "first_seen": "2026-03-01T04:52:42.991610Z",
+      "cloudflare_detected": false,
+      "last_failure_reason": null,
+      "check_history_7d": {
+        "basic_total": 0,
+        "basic_passed": 0,
+        "full_total": 0,
+        "full_passed": 0,
+        "window_start": null
+      },
+      "response_times": []
     }
   ]
 }
