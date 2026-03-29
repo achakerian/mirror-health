@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-03-29T02:04:16.841558Z",
+  "generated_at": "2026-03-29T05:11:32.456472Z",
   "runner_geo": {
-    "ip": "172.183.157.181",
+    "ip": "64.236.142.226",
     "city": "Chicago",
     "region": "Illinois",
     "country": "US",
@@ -3856,6 +3856,33 @@
         121.66565299997956,
         356.0170619999923
       ]
+    },
+    {
+      "url": "https://torrentgalaxy.click",
+      "scraper": "torrentgalaxy",
+      "tier": "Candidate",
+      "fallen_comrade": false,
+      "elo": 1000.0,
+      "score": 0.4,
+      "avg_response_ms": 0.0,
+      "consecutive_fails": 0,
+      "consecutive_passes": 0,
+      "total_checks": 0,
+      "total_passes": 0,
+      "last_checked": null,
+      "last_passed": null,
+      "last_failed": null,
+      "first_seen": "2026-03-29T05:09:40.590102Z",
+      "cloudflare_detected": false,
+      "last_failure_reason": null,
+      "check_history_7d": {
+        "basic_total": 0,
+        "basic_passed": 0,
+        "full_total": 0,
+        "full_passed": 0,
+        "window_start": null
+      },
+      "response_times": []
     }
   ]
 }
