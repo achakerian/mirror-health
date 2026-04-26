@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-04-26T02:25:57.703935Z",
+  "generated_at": "2026-04-26T05:39:25.892517Z",
   "runner_geo": {
-    "ip": "172.214.45.192",
-    "city": "Washington",
-    "region": "Virginia",
+    "ip": "20.102.222.19",
+    "city": "Chicago",
+    "region": "Illinois",
     "country": "US",
     "org": "AS8075 Microsoft Corporation",
-    "timezone": "America/New_York"
+    "timezone": "America/Chicago"
   },
   "mirrors": [
     {
@@ -4008,6 +4008,87 @@
         485.8492529999978,
         661.8694889999972
       ]
+    },
+    {
+      "url": "https://yts.ws",
+      "scraper": "yts",
+      "tier": "Candidate",
+      "fallen_comrade": false,
+      "elo": 1000.0,
+      "score": 0.4,
+      "avg_response_ms": 0.0,
+      "consecutive_fails": 0,
+      "consecutive_passes": 0,
+      "total_checks": 0,
+      "total_passes": 0,
+      "last_checked": null,
+      "last_passed": null,
+      "last_failed": null,
+      "first_seen": "2026-04-26T05:37:25.882007Z",
+      "cloudflare_detected": false,
+      "last_failure_reason": null,
+      "check_history_7d": {
+        "basic_total": 0,
+        "basic_passed": 0,
+        "full_total": 0,
+        "full_passed": 0,
+        "window_start": null
+      },
+      "response_times": []
+    },
+    {
+      "url": "https://thepiratebay.se",
+      "scraper": "tpb",
+      "tier": "Candidate",
+      "fallen_comrade": false,
+      "elo": 1000.0,
+      "score": 0.4,
+      "avg_response_ms": 0.0,
+      "consecutive_fails": 0,
+      "consecutive_passes": 0,
+      "total_checks": 0,
+      "total_passes": 0,
+      "last_checked": null,
+      "last_passed": null,
+      "last_failed": null,
+      "first_seen": "2026-04-26T05:37:49.157688Z",
+      "cloudflare_detected": false,
+      "last_failure_reason": null,
+      "check_history_7d": {
+        "basic_total": 0,
+        "basic_passed": 0,
+        "full_total": 0,
+        "full_passed": 0,
+        "window_start": null
+      },
+      "response_times": []
+    },
+    {
+      "url": "https://piratebay.se",
+      "scraper": "tpb",
+      "tier": "Candidate",
+      "fallen_comrade": false,
+      "elo": 1000.0,
+      "score": 0.4,
+      "avg_response_ms": 0.0,
+      "consecutive_fails": 0,
+      "consecutive_passes": 0,
+      "total_checks": 0,
+      "total_passes": 0,
+      "last_checked": null,
+      "last_passed": null,
+      "last_failed": null,
+      "first_seen": "2026-04-26T05:38:16.810090Z",
+      "cloudflare_detected": false,
+      "last_failure_reason": null,
+      "check_history_7d": {
+        "basic_total": 0,
+        "basic_passed": 0,
+        "full_total": 0,
+        "full_passed": 0,
+        "window_start": null
+      },
+      "response_times": []
     }
   ]
 }
