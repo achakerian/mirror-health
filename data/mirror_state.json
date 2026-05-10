@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-05-10T02:36:59.793616Z",
+  "generated_at": "2026-05-10T06:11:45.180203Z",
   "runner_geo": {
-    "ip": "20.51.57.118",
-    "city": "Cheyenne",
-    "region": "Wyoming",
+    "ip": "135.119.239.33",
+    "city": "Boydton",
+    "region": "Virginia",
     "country": "US",
     "org": "AS8075 Microsoft Corporation",
-    "timezone": "America/Denver"
+    "timezone": "America/New_York"
   },
   "mirrors": [
     {
@@ -4122,6 +4122,87 @@
         715.8402009999918,
         514.3103129998963
       ]
+    },
+    {
+      "url": "https://yify.eu",
+      "scraper": "yts",
+      "tier": "Candidate",
+      "fallen_comrade": false,
+      "elo": 1000.0,
+      "score": 0.4,
+      "avg_response_ms": 0.0,
+      "consecutive_fails": 0,
+      "consecutive_passes": 0,
+      "total_checks": 0,
+      "total_passes": 0,
+      "last_checked": null,
+      "last_passed": null,
+      "last_failed": null,
+      "first_seen": "2026-05-10T06:10:52.802969Z",
+      "cloudflare_detected": false,
+      "last_failure_reason": null,
+      "check_history_7d": {
+        "basic_total": 0,
+        "basic_passed": 0,
+        "full_total": 0,
+        "full_passed": 0,
+        "window_start": null
+      },
+      "response_times": []
+    },
+    {
+      "url": "https://annas-archive.pm",
+      "scraper": "annas_archive",
+      "tier": "Candidate",
+      "fallen_comrade": false,
+      "elo": 1000.0,
+      "score": 0.4,
+      "avg_response_ms": 0.0,
+      "consecutive_fails": 0,
+      "consecutive_passes": 0,
+      "total_checks": 0,
+      "total_passes": 0,
+      "last_checked": null,
+      "last_passed": null,
+      "last_failed": null,
+      "first_seen": "2026-05-10T06:09:34.676186Z",
+      "cloudflare_detected": false,
+      "last_failure_reason": null,
+      "check_history_7d": {
+        "basic_total": 0,
+        "basic_passed": 0,
+        "full_total": 0,
+        "full_passed": 0,
+        "window_start": null
+      },
+      "response_times": []
+    },
+    {
+      "url": "https://rutracker.ws",
+      "scraper": "rutracker",
+      "tier": "Candidate",
+      "fallen_comrade": false,
+      "elo": 1000.0,
+      "score": 0.4,
+      "avg_response_ms": 0.0,
+      "consecutive_fails": 0,
+      "consecutive_passes": 0,
+      "total_checks": 0,
+      "total_passes": 0,
+      "last_checked": null,
+      "last_passed": null,
+      "last_failed": null,
+      "first_seen": "2026-05-10T06:09:34.577116Z",
+      "cloudflare_detected": false,
+      "last_failure_reason": null,
+      "check_history_7d": {
+        "basic_total": 0,
+        "basic_passed": 0,
+        "full_total": 0,
+        "full_passed": 0,
+        "window_start": null
+      },
+      "response_times": []
     }
   ]
 }
