@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-05-24T02:52:04.101767Z",
+  "generated_at": "2026-05-24T06:38:21.396669Z",
   "runner_geo": {
-    "ip": "57.151.128.197",
-    "city": "Cheyenne",
-    "region": "Wyoming",
+    "ip": "64.236.200.112",
+    "city": "Chicago",
+    "region": "Illinois",
     "country": "US",
     "org": "AS8075 Microsoft Corporation",
-    "timezone": "America/Denver"
+    "timezone": "America/Chicago"
   },
   "mirrors": [
     {
@@ -4312,6 +4312,33 @@
         1603.0916280000015,
         1592.8090170000005
       ]
+    },
+    {
+      "url": "https://tgx.me",
+      "scraper": "torrentgalaxy",
+      "tier": "Candidate",
+      "fallen_comrade": false,
+      "elo": 1000.0,
+      "score": 0.4,
+      "avg_response_ms": 0.0,
+      "consecutive_fails": 0,
+      "consecutive_passes": 0,
+      "total_checks": 0,
+      "total_passes": 0,
+      "last_checked": null,
+      "last_passed": null,
+      "last_failed": null,
+      "first_seen": "2026-05-24T06:37:25.013098Z",
+      "cloudflare_detected": false,
+      "last_failure_reason": null,
+      "check_history_7d": {
+        "basic_total": 0,
+        "basic_passed": 0,
+        "full_total": 0,
+        "full_passed": 0,
+        "window_start": null
+      },
+      "response_times": []
     }
   ]
 }
