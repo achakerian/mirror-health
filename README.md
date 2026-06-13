@@ -28,7 +28,6 @@ Pull `data/mirror_scores.json` for pre-validated, ranked mirrors:
         "url": "https://yts.mx",
         "tier": "GOAT",
         "score": 0.85,
-        "elo": 1450,
         "avg_response_ms": 320,
         "fallen_comrade": false,
         "last_checked": "2026-02-20T10:00:00Z",
@@ -39,7 +38,7 @@ Pull `data/mirror_scores.json` for pre-validated, ranked mirrors:
 }
 ```
 
-Only **Alive** and **GOAT** mirrors appear in `mirror_scores.json`, sorted by Elo descending within each scraper.
+Only **Alive** and **GOAT** mirrors appear in `mirror_scores.json`, sorted by `score` descending (ties broken by faster `avg_response_ms`) within each scraper.
 
 For the full state including Dead and Candidate mirrors, see `data/mirror_state.json`.
 
@@ -67,15 +66,25 @@ Fallen Comrade → Candidate: Passes a basic check (resurrection, badge preserve
 
 The `fallen_comrade` flag is **permanent** — once set, it never unsets, even if the mirror reaches GOAT again.
 
-## Elo Scoring
+## Reliability Scoring
 
-Each mirror has an Elo rating. The "opponent" is a target uptime benchmark (98%, Elo ~1200).
+Each mirror gets a `score` in **0–1**: a **time-decayed [Wilson lower bound](https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Wilson_score_interval) on its success rate**. Read it as a conservative "reliable success probability."
 
-- **High-rated mirrors** barely gain on success but lose significantly on failure
-- **Low-rated mirrors** gain significantly on success but lose less on failure
-- K-factors vary by tier: Candidate=32, Alive=24, GOAT=16, Dead/FC=32
+Each check is one Bernoulli trial (pass=1, fail=0). The score has three properties that a raw pass-rate lacks:
 
-Scores are normalized to 0–1 in the output.
+- **Recency** — outcomes decay exponentially with a configurable half-life (default 7 days), so the score reflects how a mirror behaves *now*, and a mirror that stops being checked drifts down.
+- **Sample confidence** — the Wilson lower bound penalizes thin evidence: a mirror with 2/2 passes scores well below one with 200/204. New mirrors must earn trust.
+- **Latency tiebreaker** — equal-reliability mirrors are ordered by lower `avg_response_ms`. Speed never inflates the reliability number itself (the score stays a clean probability).
+
+Tuning lives in `config/scoring.json`:
+
+```json
+{ "half_life_hours": 168, "z": 1.96, "initial_score": 0.0 }
+```
+
+`z` controls conservatism (higher = harsher on small samples; 1.96 ≈ 95% confidence).
+
+> **Note:** v1 used an Elo rating against a phantom 98%-uptime "opponent." With no real opponents that degenerated into an opaque transform of success rate, so it was replaced by this reliability score. The `elo` field has been removed from the output.
 
 ## Health Checks
 

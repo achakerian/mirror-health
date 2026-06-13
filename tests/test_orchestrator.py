@@ -94,7 +94,7 @@ class TestCheckMirror:
         respx.get("https://test.com/").mock(
             return_value=httpx.Response(200, text="<html>" + "x" * 200 + "</html>")
         )
-        m = Mirror(url="https://test.com", scraper="test", elo=1000)
+        m = Mirror(url="https://test.com", scraper="test")
 
         async with httpx.AsyncClient() as client:
             await check_mirror(m, None, client, SCORING_CONFIG, run_full=False)
@@ -103,7 +103,8 @@ class TestCheckMirror:
         assert m.consecutive_fails == 0
         assert m.total_checks == 1
         assert m.total_passes == 1
-        assert m.elo > 1000  # Elo increased
+        assert m.decayed_passes == 1.0  # outcome recorded
+        assert m.score > 0.0  # reliability score increased from a pass
         assert m.last_checked is not None
         assert m.last_passed is not None
 
@@ -113,7 +114,7 @@ class TestCheckMirror:
         respx.get("https://test.com/").mock(
             return_value=httpx.Response(500, text="Server Error")
         )
-        m = Mirror(url="https://test.com", scraper="test", elo=1000)
+        m = Mirror(url="https://test.com", scraper="test")
 
         async with httpx.AsyncClient() as client:
             await check_mirror(m, None, client, SCORING_CONFIG, run_full=False)
@@ -122,7 +123,8 @@ class TestCheckMirror:
         assert m.consecutive_passes == 0
         assert m.total_checks == 1
         assert m.total_passes == 0
-        assert m.elo < 1000  # Elo decreased
+        assert m.decayed_fails == 1.0  # failure recorded
+        assert m.score == 0.0  # a lone failure yields a zero Wilson lower bound
         assert m.last_failure_reason == "server_error"
 
     @respx.mock
@@ -131,7 +133,7 @@ class TestCheckMirror:
         respx.get("https://test.com/").mock(
             return_value=httpx.Response(200, text='<html><div class="table-list">content</div></html>' + "x" * 200)
         )
-        m = Mirror(url="https://test.com", scraper="1337x", elo=1000)
+        m = Mirror(url="https://test.com", scraper="1337x")
 
         async with httpx.AsyncClient() as client:
             await check_mirror(m, SCRAPER_CONFIG, client, SCORING_CONFIG, run_full=True)
@@ -149,7 +151,7 @@ class TestCheckMirror:
         respx.get("https://test.com/").mock(
             return_value=httpx.Response(200, text="<html>" + "x" * 200 + "</html>")
         )
-        m = Mirror(url="https://test.com", scraper="1337x", elo=1000)
+        m = Mirror(url="https://test.com", scraper="1337x")
 
         async with httpx.AsyncClient() as client:
             await check_mirror(m, SCRAPER_CONFIG, client, SCORING_CONFIG, run_full=True)

@@ -27,20 +27,32 @@ class TestLoadState:
         assert state.mirrors == []
 
     def test_valid_file_loads(self, tmp_path):
-        m = Mirror(url="https://test.com", scraper="test", elo=1200)
+        m = Mirror(url="https://test.com", scraper="test", score=0.9)
         state = MirrorState(mirrors=[m])
         p = tmp_path / "state.json"
         p.write_text(state.model_dump_json(indent=2))
         loaded = load_state(p)
         assert len(loaded.mirrors) == 1
         assert loaded.mirrors[0].url == "https://test.com"
-        assert loaded.mirrors[0].elo == 1200
+        assert loaded.mirrors[0].score == 0.9
+
+    def test_legacy_elo_field_ignored(self, tmp_path):
+        """Old state files carrying the removed `elo` field still load."""
+        p = tmp_path / "state.json"
+        p.write_text(
+            '{"mirrors": [{"url": "https://old.com", "scraper": "s", "elo": 1234, '
+            '"score": 0.5}]}'
+        )
+        loaded = load_state(p)
+        assert len(loaded.mirrors) == 1
+        assert loaded.mirrors[0].score == 0.5
+        assert not hasattr(loaded.mirrors[0], "elo")
 
 
 class TestSaveState:
     def test_round_trip(self, tmp_path):
-        m1 = Mirror(url="https://a.com", scraper="s1", elo=1100, tier=Tier.ALIVE)
-        m2 = Mirror(url="https://b.com", scraper="s2", elo=900, tier=Tier.DEAD)
+        m1 = Mirror(url="https://a.com", scraper="s1", score=0.8, tier=Tier.ALIVE)
+        m2 = Mirror(url="https://b.com", scraper="s2", score=0.1, tier=Tier.DEAD)
         state = MirrorState(mirrors=[m1, m2])
         p = tmp_path / "data" / "state.json"
         save_state(state, p)
@@ -83,11 +95,11 @@ class TestAtomicWrite:
 class TestGenerateScores:
     def test_only_alive_and_goat_included(self):
         mirrors = [
-            Mirror(url="https://alive.com", scraper="s1", tier=Tier.ALIVE, elo=1200),
-            Mirror(url="https://goat.com", scraper="s1", tier=Tier.GOAT, elo=1400),
-            Mirror(url="https://dead.com", scraper="s1", tier=Tier.DEAD, elo=700),
-            Mirror(url="https://cand.com", scraper="s1", tier=Tier.CANDIDATE, elo=1000),
-            Mirror(url="https://fc.com", scraper="s1", tier=Tier.FALLEN_COMRADE, elo=800),
+            Mirror(url="https://alive.com", scraper="s1", tier=Tier.ALIVE, score=0.7),
+            Mirror(url="https://goat.com", scraper="s1", tier=Tier.GOAT, score=0.95),
+            Mirror(url="https://dead.com", scraper="s1", tier=Tier.DEAD, score=0.1),
+            Mirror(url="https://cand.com", scraper="s1", tier=Tier.CANDIDATE, score=0.4),
+            Mirror(url="https://fc.com", scraper="s1", tier=Tier.FALLEN_COMRADE, score=0.2),
         ]
         state = MirrorState(mirrors=mirrors)
         output = generate_scores(state, SCORING_CONFIG)
@@ -98,21 +110,40 @@ class TestGenerateScores:
         assert "https://cand.com" not in urls
         assert "https://fc.com" not in urls
 
-    def test_sorted_by_elo_descending(self):
+    def test_sorted_by_score_descending(self):
+        # decay_updated_at=None => current_score uses the raw decayed counts.
         mirrors = [
-            Mirror(url="https://low.com", scraper="s1", tier=Tier.ALIVE, elo=1100),
-            Mirror(url="https://high.com", scraper="s1", tier=Tier.GOAT, elo=1400),
-            Mirror(url="https://mid.com", scraper="s1", tier=Tier.ALIVE, elo=1250),
+            Mirror(url="https://low.com", scraper="s1", tier=Tier.ALIVE,
+                   decayed_passes=20, decayed_fails=3),   # ~0.68
+            Mirror(url="https://high.com", scraper="s1", tier=Tier.GOAT,
+                   decayed_passes=200, decayed_fails=0),  # ~0.99
+            Mirror(url="https://mid.com", scraper="s1", tier=Tier.ALIVE,
+                   decayed_passes=50, decayed_fails=1),   # ~0.90
         ]
         state = MirrorState(mirrors=mirrors)
         output = generate_scores(state, SCORING_CONFIG)
-        elos = [e.elo for e in output.scrapers["s1"]]
-        assert elos == [1400, 1250, 1100]
+        urls = [e.url for e in output.scrapers["s1"]]
+        assert urls == ["https://high.com", "https://mid.com", "https://low.com"]
+        scores = [e.score for e in output.scrapers["s1"]]
+        assert scores == sorted(scores, reverse=True)
+
+    def test_ties_broken_by_faster_response(self):
+        """Equal reliability => the faster mirror ranks first."""
+        mirrors = [
+            Mirror(url="https://slow.com", scraper="s1", tier=Tier.ALIVE,
+                   decayed_passes=50, decayed_fails=1, avg_response_ms=900),
+            Mirror(url="https://fast.com", scraper="s1", tier=Tier.ALIVE,
+                   decayed_passes=50, decayed_fails=1, avg_response_ms=120),
+        ]
+        state = MirrorState(mirrors=mirrors)
+        output = generate_scores(state, SCORING_CONFIG)
+        urls = [e.url for e in output.scrapers["s1"]]
+        assert urls == ["https://fast.com", "https://slow.com"]
 
     def test_grouped_by_scraper(self):
         mirrors = [
-            Mirror(url="https://a.com", scraper="yts", tier=Tier.ALIVE, elo=1200),
-            Mirror(url="https://b.com", scraper="1337x", tier=Tier.GOAT, elo=1400),
+            Mirror(url="https://a.com", scraper="yts", tier=Tier.ALIVE),
+            Mirror(url="https://b.com", scraper="1337x", tier=Tier.GOAT),
         ]
         state = MirrorState(mirrors=mirrors)
         output = generate_scores(state, SCORING_CONFIG)
@@ -128,7 +159,7 @@ class TestGenerateScores:
 
     def test_no_active_mirrors_produces_empty(self):
         mirrors = [
-            Mirror(url="https://dead.com", scraper="s1", tier=Tier.DEAD, elo=700),
+            Mirror(url="https://dead.com", scraper="s1", tier=Tier.DEAD),
         ]
         state = MirrorState(mirrors=mirrors)
         output = generate_scores(state, SCORING_CONFIG)
@@ -137,7 +168,7 @@ class TestGenerateScores:
     def test_propagates_runner_geo(self):
         geo = RunnerGeo(ip="1.2.3.4", city="Ashburn", country="US")
         mirrors = [
-            Mirror(url="https://a.com", scraper="s1", tier=Tier.ALIVE, elo=1200),
+            Mirror(url="https://a.com", scraper="s1", tier=Tier.ALIVE),
         ]
         state = MirrorState(mirrors=mirrors, runner_geo=geo)
         output = generate_scores(state, SCORING_CONFIG)
@@ -154,7 +185,7 @@ class TestGenerateScores:
 class TestSaveScores:
     def test_writes_valid_json(self, tmp_path):
         mirrors = [
-            Mirror(url="https://a.com", scraper="yts", tier=Tier.GOAT, elo=1400),
+            Mirror(url="https://a.com", scraper="yts", tier=Tier.GOAT),
         ]
         state = MirrorState(mirrors=mirrors)
         p = tmp_path / "scores.json"

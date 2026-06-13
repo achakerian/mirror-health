@@ -23,8 +23,10 @@ class TestMirror:
         assert m.scraper == "test"
         assert m.tier == "Candidate"
         assert m.fallen_comrade is False
-        assert m.elo == 1000.0
-        assert m.score == 0.4
+        assert m.score == 0.0
+        assert m.decayed_passes == 0.0
+        assert m.decayed_fails == 0.0
+        assert m.decay_updated_at is None
         assert m.avg_response_ms == 0.0
         assert m.consecutive_fails == 0
         assert m.consecutive_passes == 0
@@ -50,7 +52,9 @@ class TestMirror:
             scraper="1337x",
             tier=Tier.ALIVE,
             fallen_comrade=True,
-            elo=1220.0,
+            score=0.82,
+            decayed_passes=128.0,
+            decayed_fails=14.0,
             consecutive_passes=8,
             total_checks=142,
             total_passes=128,
@@ -61,7 +65,8 @@ class TestMirror:
         assert m2.scraper == m.scraper
         assert m2.tier == "Alive"
         assert m2.fallen_comrade is True
-        assert m2.elo == 1220.0
+        assert m2.score == 0.82
+        assert m2.decayed_passes == 128.0
         assert m2.consecutive_passes == 8
 
     def test_fallen_comrade_persists_through_serialization(self):
@@ -156,7 +161,6 @@ class TestScoresOutput:
             url="https://yts.mx",
             tier=Tier.GOAT,
             score=0.85,
-            elo=1450,
             avg_response_ms=320,
             fallen_comrade=False,
             cloudflare_detected=False,
