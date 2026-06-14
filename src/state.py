@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from .models import Mirror, MirrorState, ScoreEntry, ScoresOutput, Tier
-from .scoring import normalize_score
+from .scoring import current_score
 from .utils import logger
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
@@ -102,8 +102,7 @@ def generate_scores(state: MirrorState, scoring_config: dict) -> ScoresOutput:
         entry = ScoreEntry(
             url=mirror.url,
             tier=tier,
-            score=normalize_score(mirror.elo, scoring_config),
-            elo=mirror.elo,
+            score=current_score(mirror, now, scoring_config),
             avg_response_ms=mirror.avg_response_ms,
             fallen_comrade=mirror.fallen_comrade,
             last_checked=mirror.last_checked,
@@ -111,9 +110,9 @@ def generate_scores(state: MirrorState, scoring_config: dict) -> ScoresOutput:
         )
         scrapers.setdefault(mirror.scraper, []).append(entry)
 
-    # Sort each scraper's mirrors by elo descending
+    # Rank by reliability score (desc), breaking ties by faster response (asc).
     for scraper in scrapers:
-        scrapers[scraper].sort(key=lambda e: e.elo, reverse=True)
+        scrapers[scraper].sort(key=lambda e: (-e.score, e.avg_response_ms))
 
     return ScoresOutput(generated_at=now, runner_geo=state.runner_geo, scrapers=scrapers)
 

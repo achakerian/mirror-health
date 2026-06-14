@@ -18,7 +18,7 @@ from .checks.basic import run_basic_check
 from .checks.full import run_full_check
 from .discovery import discover_mirrors
 from .models import CheckHistory7d, Mirror, MirrorState, Tier
-from .scoring import load_scoring_config, normalize_score, update_elo
+from .scoring import load_scoring_config, record_outcome
 from .state import (
     bootstrap_state,
     load_known_domains,
@@ -67,7 +67,7 @@ async def check_mirror(
         mirror: The mirror to check (mutated in-place)
         scraper_config: Fingerprint config for full checks (None to skip full)
         client: Shared httpx async client
-        scoring_config: Elo scoring parameters
+        scoring_config: Reliability scoring parameters
         run_full: Whether to attempt a full check if basic passes
     """
     now = datetime.now(timezone.utc)
@@ -85,8 +85,7 @@ async def check_mirror(
         mirror.consecutive_passes = 0
         mirror.last_failed = now
         mirror.last_failure_reason = basic_result.failure_reason
-        mirror.elo = update_elo(mirror, passed=False, config=scoring_config)
-        mirror.score = normalize_score(mirror.elo, scoring_config)
+        record_outcome(mirror, passed=False, now=now, config=scoring_config)
         new_tier, new_fallen = evaluate_tier_transition(mirror)
         old_tier = mirror.tier
         mirror.tier = new_tier
@@ -130,9 +129,8 @@ async def check_mirror(
         mirror.consecutive_passes = 0
         mirror.last_failed = now
 
-    # Update Elo based on overall result
-    mirror.elo = update_elo(mirror, passed=full_passed, config=scoring_config)
-    mirror.score = normalize_score(mirror.elo, scoring_config)
+    # Update reliability score based on overall result
+    record_outcome(mirror, passed=full_passed, now=now, config=scoring_config)
 
     # Evaluate tier transition
     new_tier, new_fallen = evaluate_tier_transition(mirror)

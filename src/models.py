@@ -30,8 +30,11 @@ class Mirror(BaseModel):
     scraper: str
     tier: Tier = Tier.CANDIDATE
     fallen_comrade: bool = False
-    elo: float = 1000.0
-    score: float = 0.4
+    score: float = 0.0
+    # Time-decayed Bernoulli counts feeding the Wilson reliability score.
+    decayed_passes: float = 0.0
+    decayed_fails: float = 0.0
+    decay_updated_at: Optional[datetime] = None
     avg_response_ms: float = 0.0
     consecutive_fails: int = 0
     consecutive_passes: int = 0
@@ -68,7 +71,6 @@ class ScoreEntry(BaseModel):
     url: str
     tier: Tier
     score: float
-    elo: float
     avg_response_ms: float
     fallen_comrade: bool
     last_checked: Optional[datetime] = None
