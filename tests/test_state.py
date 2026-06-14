@@ -1,9 +1,15 @@
 import json
 from datetime import datetime, timezone
-from pathlib import Path
 
 from src.models import Mirror, MirrorState, RunnerGeo, Tier
-from src.state import generate_scores, load_state, save_scores, save_state
+from src.state import (
+    generate_region_scores,
+    generate_scores,
+    load_state,
+    save_region_scores,
+    save_scores,
+    save_state,
+)
 
 from .conftest import SCORING_CONFIG
 
@@ -194,3 +200,55 @@ class TestSaveScores:
         assert "scrapers" in data
         assert "yts" in data["scrapers"]
         assert data["scrapers"]["yts"][0]["url"] == "https://a.com"
+
+
+class TestRegionScores:
+    def _state(self):
+        return MirrorState(mirrors=[
+            Mirror(url="https://goat.com", scraper="s1", tier=Tier.GOAT,
+                   decayed_passes=200, decayed_fails=0),
+            Mirror(url="https://alive.com", scraper="s1", tier=Tier.ALIVE,
+                   decayed_passes=50, decayed_fails=1),
+            Mirror(url="https://geo-eu.com", scraper="s1", tier=Tier.GEO_RESTRICTED,
+                   decayed_passes=10, decayed_fails=2, geo_reachable_regions=["EU"]),
+            Mirror(url="https://geo-asia.com", scraper="s1", tier=Tier.GEO_RESTRICTED,
+                   decayed_passes=5, decayed_fails=1, geo_reachable_regions=["ASIA"]),
+            Mirror(url="https://dead.com", scraper="s1", tier=Tier.DEAD,
+                   decayed_passes=0, decayed_fails=5),
+        ])
+
+    def test_us_file_excludes_geo_restricted_and_dead(self):
+        out = generate_region_scores(self._state(), SCORING_CONFIG, "US")
+        urls = [e.url for e in out.scrapers["s1"]]
+        assert set(urls) == {"https://goat.com", "https://alive.com"}
+        assert all(e.validated for e in out.scrapers["s1"])
+
+    def test_eu_file_includes_validated_plus_eu_geo(self):
+        out = generate_region_scores(self._state(), SCORING_CONFIG, "EU")
+        by = {e.url: e for e in out.scrapers["s1"]}
+        assert "https://goat.com" in by          # assumed reachable
+        assert "https://geo-eu.com" in by         # reachability-only evidence
+        assert "https://geo-asia.com" not in by   # reachable only in ASIA
+        assert by["https://goat.com"].validated is True
+        assert by["https://geo-eu.com"].validated is False
+
+    def test_validated_ranked_above_reachability_only(self):
+        out = generate_region_scores(self._state(), SCORING_CONFIG, "EU")
+        flags = [e.validated for e in out.scrapers["s1"]]
+        assert flags == sorted(flags, reverse=True)  # all True before any False
+
+    def test_fidelity_note_present(self):
+        out = generate_region_scores(self._state(), SCORING_CONFIG, "EU")
+        assert "check-host" in out.fidelity_note
+        assert out.region == "EU"
+
+    def test_save_writes_one_file_per_region(self, tmp_path):
+        save_region_scores(self._state(), SCORING_CONFIG, ["US", "EU", "ASIA"], data_dir=tmp_path)
+        for r in ("US", "EU", "ASIA"):
+            assert (tmp_path / f"mirror_scores_{r}.json").exists()
+        eu = json.loads((tmp_path / "mirror_scores_EU.json").read_text())
+        assert eu["region"] == "EU"
+        assert "s1" in eu["scrapers"]
+        asia = json.loads((tmp_path / "mirror_scores_ASIA.json").read_text())
+        asia_urls = [e["url"] for e in asia["scrapers"]["s1"]]
+        assert "https://geo-asia.com" in asia_urls

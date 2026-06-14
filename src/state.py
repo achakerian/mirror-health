@@ -5,9 +5,24 @@ import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
-from .models import Mirror, MirrorState, ScoreEntry, ScoresOutput, Tier
+from .models import (
+    Mirror,
+    MirrorState,
+    RegionScoreEntry,
+    RegionScoresOutput,
+    ScoreEntry,
+    ScoresOutput,
+    Tier,
+)
 from .scoring import current_score
 from .utils import logger
+
+REGION_FIDELITY_NOTE = (
+    "validated=true: passed content-fingerprint checks from a US runner; for non-US "
+    "regions these are assumed reachable (US vantage only, not re-verified here). "
+    "validated=false: failed the US check but confirmed reachable from this region via "
+    "check-host.net (reachability only, no content validation)."
+)
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 CONFIG_DIR = Path(__file__).resolve().parent.parent / "config"
@@ -123,3 +138,76 @@ def save_scores(state: MirrorState, scoring_config: dict, path: Path = SCORES_PA
     _atomic_write(path, output.model_dump_json(indent=2))
     total = sum(len(entries) for entries in output.scrapers.values())
     logger.info("Saved scores with %d active mirrors to %s", total, path)
+
+
+def generate_region_scores(
+    state: MirrorState, scoring_config: dict, region: str
+) -> RegionScoresOutput:
+    """Build the score file for a single region.
+
+    For region R we include:
+      - Alive/GOAT mirrors (content-validated from the US runner), assumed reachable
+        in R unless explicit geo evidence excludes it. ``validated=True``.
+      - GeoRestricted mirrors whose ``geo_reachable_regions`` contains R, but never
+        in the US file (they're US-blocked by definition). ``validated=False``.
+    """
+    now = datetime.now(timezone.utc)
+    scrapers: dict[str, list[RegionScoreEntry]] = {}
+
+    for mirror in state.mirrors:
+        tier = Tier(mirror.tier)
+        if tier in (Tier.ALIVE, Tier.GOAT):
+            # We only have explicit per-region evidence for geo-restricted mirrors;
+            # validated Alive/GOAT are assumed reachable unless evidence excludes R.
+            geo = mirror.geo_reachable_regions
+            if region != "US" and geo and region not in geo:
+                continue
+            validated = True
+        elif tier == Tier.GEO_RESTRICTED:
+            if region == "US" or region not in mirror.geo_reachable_regions:
+                continue
+            validated = False
+        else:
+            continue
+
+        scrapers.setdefault(mirror.scraper, []).append(
+            RegionScoreEntry(
+                url=mirror.url,
+                tier=tier,
+                score=current_score(mirror, now, scoring_config),
+                avg_response_ms=mirror.avg_response_ms,
+                fallen_comrade=mirror.fallen_comrade,
+                validated=validated,
+                last_checked=mirror.last_checked,
+                cloudflare_detected=mirror.cloudflare_detected,
+                geo_reachable_regions=mirror.geo_reachable_regions,
+            )
+        )
+
+    # Validated mirrors first, then by score desc, then faster response.
+    for scraper in scrapers:
+        scrapers[scraper].sort(key=lambda e: (not e.validated, -e.score, e.avg_response_ms))
+
+    return RegionScoresOutput(
+        region=region,
+        generated_at=now,
+        runner_geo=state.runner_geo,
+        fidelity_note=REGION_FIDELITY_NOTE,
+        scrapers=scrapers,
+    )
+
+
+def save_region_scores(
+    state: MirrorState,
+    scoring_config: dict,
+    regions: list[str],
+    data_dir: Path = DATA_DIR,
+) -> None:
+    """Write one ``mirror_scores_<REGION>.json`` per configured region, atomically."""
+    written = []
+    for region in regions:
+        output = generate_region_scores(state, scoring_config, region)
+        path = data_dir / f"mirror_scores_{region}.json"
+        _atomic_write(path, output.model_dump_json(indent=2))
+        written.append(path.name)
+    logger.info("Saved %d region score files: %s", len(written), ", ".join(written))

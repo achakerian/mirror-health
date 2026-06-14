@@ -18,11 +18,13 @@ from .checks.basic import run_basic_check
 from .checks.full import run_full_check
 from .discovery import discover_mirrors
 from .models import CheckHistory7d, Mirror, MirrorState, Tier
+from .geo import GeoBudget, check_geo_reachability, should_geo_recheck
 from .scoring import load_scoring_config, record_outcome
 from .state import (
     bootstrap_state,
     load_known_domains,
     load_state,
+    save_region_scores,
     save_scores,
     save_state,
 )
@@ -37,6 +39,7 @@ HISTORY_WINDOW = timedelta(days=7)
 # Module-level ref for signal handler to save partial work
 _current_state: MirrorState | None = None
 _current_scoring_config: dict[str, Any] | None = None
+_current_geo_config: dict[str, Any] | None = None
 
 
 def _maybe_reset_7d_history(mirror: Mirror, now: datetime) -> None:
@@ -60,6 +63,8 @@ async def check_mirror(
     client: httpx.AsyncClient,
     scoring_config: dict[str, Any],
     run_full: bool = False,
+    geo_config: dict[str, Any] | None = None,
+    geo_budget: GeoBudget | None = None,
 ) -> None:
     """Run health checks on a single mirror and update its state in-place.
 
@@ -69,6 +74,8 @@ async def check_mirror(
         client: Shared httpx async client
         scoring_config: Reliability scoring parameters
         run_full: Whether to attempt a full check if basic passes
+        geo_config: check-host geo config (None disables geo-restriction detection)
+        geo_budget: Shared per-run cap on geo rechecks
     """
     now = datetime.now(timezone.utc)
     mirror.last_checked = now
@@ -86,8 +93,10 @@ async def check_mirror(
         mirror.last_failed = now
         mirror.last_failure_reason = basic_result.failure_reason
         record_outcome(mirror, passed=False, now=now, config=scoring_config)
-        new_tier, new_fallen = evaluate_tier_transition(mirror)
         old_tier = mirror.tier
+        new_tier, new_fallen = await _resolve_failed_tier(
+            mirror, basic_result.failure_reason, now, client, geo_config, geo_budget
+        )
         mirror.tier = new_tier
         mirror.fallen_comrade = new_fallen
         if old_tier != new_tier:
@@ -99,6 +108,8 @@ async def check_mirror(
 
     mirror.check_history_7d.basic_passed += 1
     _update_response_times(mirror, basic_result.response_ms)
+    # Reachable from the US runner again -> not geo-restricted.
+    mirror.geo_reachable_regions = []
 
     # --- Full check (only if basic passed and requested) ---
     full_passed = True
@@ -141,10 +152,52 @@ async def check_mirror(
         logger.info("Tier transition: %s %s -> %s", mirror.url, old_tier, new_tier)
 
 
+async def _resolve_failed_tier(
+    mirror: Mirror,
+    failure_reason: str | None,
+    now: datetime,
+    client: httpx.AsyncClient,
+    geo_config: dict[str, Any] | None,
+    geo_budget: GeoBudget | None,
+) -> tuple[Tier, bool]:
+    """Decide the post-failure tier, consulting check-host.net for geo-restriction.
+
+    Returns (tier, fallen_comrade). Falls back to the standard ladder whenever
+    geo info is unavailable or inconclusive.
+    """
+    standard_tier, standard_fallen = evaluate_tier_transition(mirror)
+
+    if not should_geo_recheck(
+        mirror, standard_tier, failure_reason, now, geo_config, geo_budget
+    ):
+        return standard_tier, standard_fallen
+
+    result = await check_geo_reachability(mirror.url, client, geo_config)
+    mirror.geo_checked_at = now
+    if not result.ok:
+        return standard_tier, standard_fallen  # undetermined
+
+    mirror.geo_reachable_regions = result.reachable_regions
+    if result.reachable_regions:
+        # Alive elsewhere -> geo-blocked, not dead. Don't newly set the FC badge.
+        return Tier.GEO_RESTRICTED, mirror.fallen_comrade
+
+    # Confirmed unreachable from every region we probed.
+    if Tier(mirror.tier) == Tier.GEO_RESTRICTED:
+        # Was geo-restricted, now gone everywhere -> it really died.
+        return (
+            Tier.FALLEN_COMRADE if mirror.fallen_comrade else Tier.DEAD,
+            mirror.fallen_comrade,
+        )
+    return standard_tier, standard_fallen
+
+
 async def run_active_check(
     state: MirrorState,
     scrapers: dict,
     scoring_config: dict[str, Any],
+    geo_config: dict[str, Any] | None = None,
+    geo_budget: GeoBudget | None = None,
 ) -> None:
     """Active check: probe all Candidate, Alive, and GOAT mirrors."""
     active_tiers = {Tier.CANDIDATE.value, Tier.ALIVE.value, Tier.GOAT.value}
@@ -161,7 +214,8 @@ async def run_active_check(
             for mirror in mirrors:
                 try:
                     await check_mirror(
-                        mirror, scraper_cfg, client, scoring_config, run_full=True
+                        mirror, scraper_cfg, client, scoring_config, run_full=True,
+                        geo_config=geo_config, geo_budget=geo_budget,
                     )
                 except Exception:
                     logger.exception("Unexpected error checking %s", mirror.url)
@@ -178,9 +232,11 @@ async def run_active_check(
 async def run_inactive_check(
     state: MirrorState,
     scoring_config: dict[str, Any],
+    geo_config: dict[str, Any] | None = None,
+    geo_budget: GeoBudget | None = None,
 ) -> None:
-    """Inactive check: re-probe Dead and Fallen Comrade mirrors (basic only)."""
-    inactive_tiers = {Tier.DEAD.value, Tier.FALLEN_COMRADE.value}
+    """Inactive check: re-probe Dead, Fallen Comrade, and GeoRestricted mirrors (basic only)."""
+    inactive_tiers = {Tier.DEAD.value, Tier.FALLEN_COMRADE.value, Tier.GEO_RESTRICTED.value}
 
     async with httpx.AsyncClient(http2=True) as client:
         by_scraper: dict[str, list[Mirror]] = {}
@@ -192,7 +248,8 @@ async def run_inactive_check(
             for mirror in mirrors:
                 try:
                     await check_mirror(
-                        mirror, None, client, scoring_config, run_full=False
+                        mirror, None, client, scoring_config, run_full=False,
+                        geo_config=geo_config, geo_budget=geo_budget,
                     )
                 except Exception:
                     logger.exception("Unexpected error checking %s", mirror.url)
@@ -242,8 +299,12 @@ async def run_discovery(
                     logger.info("Added new mirror: %s [%s]", mirror.url, mirror.scraper)
 
 
-def _save_results(state: MirrorState, scoring_config: dict[str, Any]) -> None:
-    """Save state and scores, handling errors for each independently."""
+def _save_results(
+    state: MirrorState,
+    scoring_config: dict[str, Any],
+    geo_config: dict[str, Any] | None = None,
+) -> None:
+    """Save state, scores, and per-region scores, each handled independently."""
     try:
         save_state(state)
     except Exception:
@@ -254,12 +315,18 @@ def _save_results(state: MirrorState, scoring_config: dict[str, Any]) -> None:
     except Exception:
         logger.exception("Failed to save scores")
 
+    if geo_config and geo_config.get("regions"):
+        try:
+            save_region_scores(state, scoring_config, list(geo_config["regions"].keys()))
+        except Exception:
+            logger.exception("Failed to save region scores")
+
 
 def _sigterm_handler(signum: int, frame: Any) -> None:
     """On SIGTERM, save whatever state we have before exiting."""
     logger.warning("Received SIGTERM, saving partial state before exit")
     if _current_state is not None and _current_scoring_config is not None:
-        _save_results(_current_state, _current_scoring_config)
+        _save_results(_current_state, _current_scoring_config, _current_geo_config)
     sys.exit(0)
 
 
@@ -272,8 +339,23 @@ def _load_config_file(path: Path) -> Any:
         raise SystemExit(1) from e
 
 
+def _load_geo_config() -> dict[str, Any] | None:
+    """Load config/regions.json if present and enabled; else None (geo disabled)."""
+    path = CONFIG_DIR / "regions.json"
+    if not path.exists():
+        return None
+    try:
+        cfg = json.loads(path.read_text())
+    except json.JSONDecodeError as e:
+        logger.error("Failed to load regions config %s: %s", path, e)
+        return None
+    if not cfg.get("enabled", True):
+        return None
+    return cfg
+
+
 def main() -> None:
-    global _current_state, _current_scoring_config
+    global _current_state, _current_scoring_config, _current_geo_config
 
     setup_logging()
     start_time = time.monotonic()
@@ -293,6 +375,7 @@ def main() -> None:
     known_domains = _load_config_file(CONFIG_DIR / "known_domains.json")
     tlds = _load_config_file(CONFIG_DIR / "tlds.json")
     scoring_config = load_scoring_config()
+    geo_config = _load_geo_config()
 
     # Load state and bootstrap seed mirrors
     state = load_state()
@@ -307,17 +390,24 @@ def main() -> None:
     # Store refs for signal handler
     _current_state = state
     _current_scoring_config = scoring_config
+    _current_geo_config = geo_config
+
+    geo_budget = (
+        GeoBudget(remaining=geo_config.get("per_run_recheck_cap", 15))
+        if geo_config
+        else None
+    )
 
     # Run appropriate workflow
     if args.mode == "active":
-        asyncio.run(run_active_check(state, scrapers, scoring_config))
+        asyncio.run(run_active_check(state, scrapers, scoring_config, geo_config, geo_budget))
     elif args.mode == "inactive":
-        asyncio.run(run_inactive_check(state, scoring_config))
+        asyncio.run(run_inactive_check(state, scoring_config, geo_config, geo_budget))
     elif args.mode == "discovery":
         asyncio.run(run_discovery(state, known_domains, tlds))
 
     # Save results
-    _save_results(state, scoring_config)
+    _save_results(state, scoring_config, geo_config)
 
     elapsed = time.monotonic() - start_time
     logger.info(

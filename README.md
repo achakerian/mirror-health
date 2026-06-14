@@ -42,6 +42,16 @@ Only **Alive** and **GOAT** mirrors appear in `mirror_scores.json`, sorted by `s
 
 For the full state including Dead and Candidate mirrors, see `data/mirror_state.json`.
 
+### Per-region files
+
+`mirror_scores.json` reflects the **US** vantage point (where the runner lives). Consumers elsewhere should read the matching region file: `data/mirror_scores_US.json`, `mirror_scores_EU.json`, `mirror_scores_ASIA.json`, `mirror_scores_SA.json`, `mirror_scores_OCEANIA.json`.
+
+Each region entry carries a `validated` flag:
+- `validated: true` — content-fingerprint checked from the US runner. For non-US regions these are *assumed* reachable (we only validate from the US; not re-verified per region).
+- `validated: false` — failed the US check but confirmed **reachable** from that region via check-host.net (reachability only, no fingerprint).
+
+Validated mirrors are ranked above reachability-only ones. Each file embeds a `fidelity_note` spelling this out. Regions are defined in `config/regions.json`.
+
 ## Tier System
 
 | Tier | Meaning |
@@ -51,6 +61,7 @@ For the full state including Dead and Candidate mirrors, see `data/mirror_state.
 | **GOAT** | Proven reliable over extended period |
 | **Dead** | Failing consistently |
 | **Fallen Comrade** | Was once GOAT, now failing — a permanent badge of honor |
+| **GeoRestricted** | Fails from the US runner but confirmed alive elsewhere (geo-blocked) |
 
 ### Transitions
 
@@ -60,11 +71,13 @@ Candidate → Alive:          3 consecutive full health check passes
 Alive → GOAT:               >90% success rate over 7 days AND avg response <2s
 Alive → Dead:               5 consecutive basic check failures
 GOAT → Fallen Comrade:      5 consecutive basic check failures
-Dead → Candidate:           Passes a basic check (resurrection)
-Fallen Comrade → Candidate: Passes a basic check (resurrection, badge preserved)
+* → GeoRestricted:          Would go Dead/FC, but check-host.net confirms it's
+                            reachable from a non-US region (see Geo-restriction)
+GeoRestricted → Dead/FC:    Re-probe finds it unreachable everywhere
+Dead/FC/GeoRestricted → Candidate: Passes a basic check (resurrection; FC badge preserved)
 ```
 
-The `fallen_comrade` flag is **permanent** — once set, it never unsets, even if the mirror reaches GOAT again.
+The `fallen_comrade` flag is **permanent** — once set, it never unsets, even if the mirror reaches GOAT again. A geo block does **not** earn the badge (the mirror didn't truly fall).
 
 ## Reliability Scoring
 
@@ -104,12 +117,20 @@ Scraper-specific fingerprint validation:
 | Anna's Archive | `/search?q=test` | HTML contains `js-vim-focus` |
 | RuTracker | `/` | HTML contains `f-name` |
 
+## Geo-restriction Detection
+
+The checks run from a single US-based runner, so a mirror that **geo-blocks US IPs** looks identical to a dead one. To tell them apart, when a mirror fails its basic check with a *geo-plausible* reason (timeout / connection refused / 403 / 5xx) **and** would otherwise drop to Dead/Fallen Comrade, it's probed from ~10 worldwide nodes via [check-host.net](https://check-host.net). If reachable from a non-US region, it's classified **GeoRestricted** instead of Dead, and surfaced in that region's score file.
+
+This is bounded so it can't blow the active-check budget — only mirrors at the demotion brink are probed, capped per run (`per_run_recheck_cap`) with a per-mirror cooldown (`recheck_cooldown_hours`). All of it is best-effort: if check-host is unreachable or inconclusive, the mirror follows the normal ladder. Tuning lives in `config/regions.json`.
+
+> **Fidelity:** check-host confirms *reachability*, not that the scraper fingerprint still works from that region. GeoRestricted mirrors are therefore `validated: false` in region files. Validated multi-region checks (proxies / self-hosted runners) are a planned upgrade.
+
 ## Workflows
 
 | Workflow | Schedule | What it does |
 |---|---|---|
 | `active_check.yml` | Every 2 hours | Check Candidate + Alive + GOAT mirrors |
-| `inactive_check.yml` | Daily 06:00 UTC | Re-probe Dead + Fallen Comrade mirrors |
+| `inactive_check.yml` | Daily 06:00 UTC | Re-probe Dead + Fallen Comrade + GeoRestricted mirrors |
 | `discovery.yml` | Weekly Sunday 03:00 UTC | TLD brute force to find new mirrors |
 
 Estimated monthly GitHub Actions usage: ~582 minutes (within 1,000 min budget).
@@ -148,6 +169,6 @@ This project monitors **indexer/search sites** only. For BitTorrent **tracker** 
 
 ## Known Limitations
 
-- GitHub Actions runners are US-based. Mirrors that geo-block US IPs will appear as Dead.
+- GitHub Actions runners are US-based. Mirrors that geo-block US IPs are detected via check-host.net and classified **GeoRestricted** (not Dead) — but they're confirmed *reachable*, not content-validated, from other regions. Fully-validated non-US checks need proxies/self-hosted runners (planned).
 - Cloudflare-protected mirrors are detected and counted as failures in v1.
 - Scraper fingerprints may break if a site redesigns. If all mirrors for a scraper fail simultaneously, the fingerprint in `config/scrapers.json` likely needs updating.

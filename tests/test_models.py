@@ -10,6 +10,7 @@ class TestTier:
         assert Tier.GOAT == "GOAT"
         assert Tier.DEAD == "Dead"
         assert Tier.FALLEN_COMRADE == "FallenComrade"
+        assert Tier.GEO_RESTRICTED == "GeoRestricted"
 
     def test_str_comparison(self):
         assert Tier.CANDIDATE == "Candidate"

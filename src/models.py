@@ -13,6 +13,7 @@ class Tier(enum.StrEnum):
     GOAT = "GOAT"
     DEAD = "Dead"
     FALLEN_COMRADE = "FallenComrade"
+    GEO_RESTRICTED = "GeoRestricted"
 
 
 class CheckHistory7d(BaseModel):
@@ -45,6 +46,10 @@ class Mirror(BaseModel):
     last_failed: Optional[datetime] = None
     first_seen: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     cloudflare_detected: bool = False
+    # Geo-restriction: regions (non-US) check-host saw this mirror reachable from
+    # while it was failing the US check. Populated only when geo-rechecked.
+    geo_checked_at: Optional[datetime] = None
+    geo_reachable_regions: list[str] = Field(default_factory=list)
     last_failure_reason: Optional[str] = None
     check_history_7d: CheckHistory7d = Field(default_factory=CheckHistory7d)
     response_times: list[float] = Field(default_factory=list)
@@ -81,3 +86,26 @@ class ScoresOutput(BaseModel):
     generated_at: Optional[datetime] = None
     runner_geo: Optional[RunnerGeo] = None
     scrapers: dict[str, list[ScoreEntry]] = Field(default_factory=dict)
+
+
+class RegionScoreEntry(BaseModel):
+    model_config = ConfigDict(use_enum_values=True)
+
+    url: str
+    tier: Tier
+    score: float
+    avg_response_ms: float
+    fallen_comrade: bool
+    # True: content-validated from the US runner. False: reachability-only via check-host.
+    validated: bool
+    last_checked: Optional[datetime] = None
+    cloudflare_detected: bool = False
+    geo_reachable_regions: list[str] = Field(default_factory=list)
+
+
+class RegionScoresOutput(BaseModel):
+    region: str
+    generated_at: Optional[datetime] = None
+    runner_geo: Optional[RunnerGeo] = None
+    fidelity_note: str = ""
+    scrapers: dict[str, list[RegionScoreEntry]] = Field(default_factory=dict)

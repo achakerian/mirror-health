@@ -28,8 +28,9 @@ def evaluate_tier_transition(mirror: Mirror) -> tuple[Tier, bool]:
 
     # --- Demotion: 5 consecutive failures ---
     if mirror.consecutive_fails >= CONSECUTIVE_FAILS_THRESHOLD:
-        if tier in (Tier.DEAD, Tier.FALLEN_COMRADE):
-            # Already dead/FC — no further demotion
+        if tier in (Tier.DEAD, Tier.FALLEN_COMRADE, Tier.GEO_RESTRICTED):
+            # Already terminal-ish — no further demotion. (Entering/leaving
+            # GeoRestricted is decided in check_mirror from live geo data.)
             return tier, fallen
         if tier == Tier.GOAT:
             return Tier.FALLEN_COMRADE, True
@@ -38,8 +39,8 @@ def evaluate_tier_transition(mirror: Mirror) -> tuple[Tier, bool]:
             return Tier.FALLEN_COMRADE, True
         return Tier.DEAD, False
 
-    # --- Resurrection: Dead/FC passes a basic check ---
-    if tier in (Tier.DEAD, Tier.FALLEN_COMRADE):
+    # --- Resurrection: Dead/FC/GeoRestricted passes a basic check ---
+    if tier in (Tier.DEAD, Tier.FALLEN_COMRADE, Tier.GEO_RESTRICTED):
         if mirror.consecutive_passes >= 1:
             return Tier.CANDIDATE, fallen
         return tier, fallen

@@ -182,6 +182,26 @@ class TestNoTransition:
         assert new_tier == Tier.ALIVE
 
 
+class TestGeoRestricted:
+    def test_stays_geo_restricted_on_more_fails(self):
+        """A GeoRestricted mirror that keeps failing the US check is not demoted by
+        the standard ladder — entering/leaving the tier is decided in check_mirror."""
+        m = _make_mirror(tier=Tier.GEO_RESTRICTED, consecutive_fails=10, consecutive_passes=0)
+        new_tier, fallen = evaluate_tier_transition(m)
+        assert new_tier == Tier.GEO_RESTRICTED
+
+    def test_resurrects_to_candidate_on_pass(self):
+        m = _make_mirror(tier=Tier.GEO_RESTRICTED, consecutive_passes=1)
+        new_tier, fallen = evaluate_tier_transition(m)
+        assert new_tier == Tier.CANDIDATE
+
+    def test_resurrection_preserves_fallen_badge(self):
+        m = _make_mirror(tier=Tier.GEO_RESTRICTED, consecutive_passes=1, fallen_comrade=True)
+        new_tier, fallen = evaluate_tier_transition(m)
+        assert new_tier == Tier.CANDIDATE
+        assert fallen is True
+
+
 class TestDeadAndFCStayOnMoreFailures:
     def test_dead_with_more_fails_stays_dead(self):
         m = _make_mirror(tier=Tier.DEAD, consecutive_fails=10, consecutive_passes=0)
