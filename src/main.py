@@ -376,6 +376,23 @@ def _load_denylist() -> set[str]:
     return {_normalize_host(h) for h in data}
 
 
+def _prune_denylisted(state: MirrorState, denylist: set[str]) -> int:
+    """Evict any tracked mirror whose host is on the denylist. Returns count removed.
+
+    The denylist gates *new* additions in discovery, but clones added before a host
+    was denylisted would otherwise linger in state (and could resurrect via the
+    inactive re-probe and get published). This purges them on every load.
+    """
+    if not denylist:
+        return 0
+    keep = [m for m in state.mirrors if _normalize_host(m.url) not in denylist]
+    removed = len(state.mirrors) - len(keep)
+    if removed:
+        state.mirrors = keep
+        logger.info("Pruned %d denylisted mirror(s) from state", removed)
+    return removed
+
+
 def main() -> None:
     global _current_state, _current_scoring_config, _current_geo_config
 
@@ -398,9 +415,11 @@ def main() -> None:
     tlds = _load_config_file(CONFIG_DIR / "tlds.json")
     scoring_config = load_scoring_config()
     geo_config = _load_geo_config()
+    denylist = _load_denylist()
 
-    # Load state and bootstrap seed mirrors
+    # Load state, evict any now-denylisted hosts, then bootstrap seed mirrors
     state = load_state()
+    _prune_denylisted(state, denylist)
     added = bootstrap_state(state)
     if added:
         logger.info("Bootstrapped %d seed mirrors", added)
@@ -426,7 +445,7 @@ def main() -> None:
     elif args.mode == "inactive":
         asyncio.run(run_inactive_check(state, scoring_config, geo_config, geo_budget))
     elif args.mode == "discovery":
-        asyncio.run(run_discovery(state, known_domains, tlds, _load_denylist()))
+        asyncio.run(run_discovery(state, known_domains, tlds, denylist))
 
     # Save results
     _save_results(state, scoring_config, geo_config)
