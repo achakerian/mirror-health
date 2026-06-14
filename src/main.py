@@ -266,6 +266,7 @@ async def run_discovery(
     state: MirrorState,
     known_domains: dict[str, list[str]],
     tlds: list[str],
+    denylist: set[str] | None = None,
 ) -> None:
     """Discovery: TLD brute force for new mirrors, parallelized across scrapers."""
     existing_urls = {m.url for m in state.mirrors}
@@ -279,7 +280,8 @@ async def run_discovery(
         ) -> list[Mirror]:
             try:
                 return await discover_mirrors(
-                    scraper_name, base_names, tlds, state, doh_client, probe_client
+                    scraper_name, base_names, tlds, state, doh_client, probe_client,
+                    denylist=denylist,
                 )
             except Exception:
                 logger.exception("Unexpected error during discovery for %s", scraper_name)
@@ -354,6 +356,26 @@ def _load_geo_config() -> dict[str, Any] | None:
     return cfg
 
 
+def _normalize_host(host: str) -> str:
+    h = str(host).strip().lower()
+    for prefix in ("https://", "http://", "www."):
+        h = h.removeprefix(prefix)
+    return h.rstrip("/")
+
+
+def _load_denylist() -> set[str]:
+    """Load config/denylist.json — known scam/clone hosts discovery must never add."""
+    path = CONFIG_DIR / "denylist.json"
+    if not path.exists():
+        return set()
+    try:
+        data = json.loads(path.read_text())
+    except json.JSONDecodeError as e:
+        logger.error("Failed to load denylist %s: %s", path, e)
+        return set()
+    return {_normalize_host(h) for h in data}
+
+
 def main() -> None:
     global _current_state, _current_scoring_config, _current_geo_config
 
@@ -404,7 +426,7 @@ def main() -> None:
     elif args.mode == "inactive":
         asyncio.run(run_inactive_check(state, scoring_config, geo_config, geo_budget))
     elif args.mode == "discovery":
-        asyncio.run(run_discovery(state, known_domains, tlds))
+        asyncio.run(run_discovery(state, known_domains, tlds, _load_denylist()))
 
     # Save results
     _save_results(state, scoring_config, geo_config)

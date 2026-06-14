@@ -1,9 +1,54 @@
 {
-  "yts": ["https://yts.mx"],
-  "1337x": ["https://1337x.to"],
-  "tpb": ["https://thepiratebay.org"],
-  "torrentgalaxy": ["https://torrentgalaxy.to"],
-  "eztv": ["https://eztv.re"],
-  "annas_archive": ["https://annas-archive.org"],
-  "rutracker": ["https://rutracker.org"]
+  "yts": [
+    "https://yts.mx",
+    "https://yts.rs",
+    "https://yts.lt",
+    "https://yts.am",
+    "https://yts.ag",
+    "https://yts.pm",
+    "https://yts.vc"
+  ],
+  "1337x": [
+    "https://1337x.to",
+    "https://1337x.st",
+    "https://x1337x.ws",
+    "https://x1337x.eu",
+    "https://x1337x.cc",
+    "https://x1337x.se",
+    "https://1337x.tw"
+  ],
+  "tpb": [
+    "https://thepiratebay.org",
+    "https://thepiratebay.zone",
+    "https://tpb.party",
+    "https://thepiratebay.party",
+    "https://piratebay.live",
+    "https://piratebay.party",
+    "https://thepiratebay10.org"
+  ],
+  "torrentgalaxy": [
+    "https://torrentgalaxy.to",
+    "https://torrentgalaxy.mx"
+  ],
+  "eztv": [
+    "https://eztvx.to",
+    "https://eztv.re",
+    "https://eztv1.xyz",
+    "https://eztv.wf",
+    "https://eztv.tf",
+    "https://eztv.yt"
+  ],
+  "annas_archive": [
+    "https://annas-archive.org",
+    "https://annas-archive.gd",
+    "https://annas-archive.gl",
+    "https://annas-archive.pk"
+  ],
+  "rutracker": [
+    "https://rutracker.org",
+    "https://rutracker.net",
+    "https://rutracker.nl",
+    "https://rutracker.cr",
+    "https://maintracker.org"
+  ]
 }
