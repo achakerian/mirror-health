@@ -6,6 +6,7 @@ import respx
 from src.main import (
     MAX_RESPONSE_TIMES,
     _maybe_reset_7d_history,
+    _prune_denylisted,
     _update_response_times,
     check_mirror,
     run_active_check,
@@ -221,6 +222,29 @@ GEO_CONFIG = {
     "recheck_failure_reasons": ["timeout", "server_error", "connect_error"],
     "regions": {"US": ["us"], "EU": ["de", "nl", "fr"]},
 }
+
+
+class TestPruneDenylisted:
+    def test_removes_matching_hosts(self):
+        state = MirrorState(mirrors=[
+            Mirror(url="https://good.to", scraper="s"),
+            Mirror(url="https://rutracker.me", scraper="rutracker"),
+            Mirror(url="https://annas-archive.su", scraper="annas_archive"),
+        ])
+        removed = _prune_denylisted(state, {"rutracker.me", "annas-archive.su"})
+        assert removed == 2
+        assert [m.url for m in state.mirrors] == ["https://good.to"]
+
+    def test_empty_denylist_is_noop(self):
+        state = MirrorState(mirrors=[Mirror(url="https://good.to", scraper="s")])
+        assert _prune_denylisted(state, set()) == 0
+        assert len(state.mirrors) == 1
+
+    def test_matches_regardless_of_www_or_scheme(self):
+        state = MirrorState(mirrors=[Mirror(url="https://www.rutracker.me", scraper="rutracker")])
+        removed = _prune_denylisted(state, {"rutracker.me"})
+        assert removed == 1
+        assert state.mirrors == []
 
 
 class TestGeoRestrictionInCheckMirror:
