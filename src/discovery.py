@@ -52,6 +52,7 @@ async def discover_mirrors(
     existing_state: MirrorState,
     doh_client: httpx.AsyncClient,
     probe_client: httpx.AsyncClient,
+    denylist: set[str] | None = None,
 ) -> list[Mirror]:
     """Discover new mirrors by brute-forcing base domain + TLD combinations.
 
@@ -62,18 +63,31 @@ async def discover_mirrors(
         existing_state: Current mirror state for deduplication
         doh_client: httpx client dedicated to DoH resolution
         probe_client: httpx client dedicated to mirror HTTP probes
+        denylist: Known scam/phishing/clone hosts to never probe or add. Some
+            ``base.tld`` combos collide with documented impersonator domains that
+            can mimic the real site closely enough to pass the fingerprint check.
     """
     existing_urls = {m.url for m in existing_state.mirrors}
+    denied = denylist or set()
     discovered: list[Mirror] = []
 
     # Generate all candidate domains
     candidates: list[str] = []
+    skipped_denied = 0
     for base in base_names:
         for tld in tlds:
             domain = f"{base}.{tld}"
+            if domain in denied:
+                skipped_denied += 1
+                continue
             url = f"https://{domain}"
             if url not in existing_urls:
                 candidates.append(domain)
+
+    if skipped_denied:
+        logger.info(
+            "Discovery [%s]: skipped %d denylisted candidate(s)", scraper_name, skipped_denied
+        )
 
     logger.info(
         "Discovery [%s]: %d candidates to probe (%d base names x %d TLDs, %d already tracked)",

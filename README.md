@@ -148,6 +148,14 @@ Edit `config/known_domains.json` and submit a PR. The file maps scraper names to
 
 The discovery workflow will combine these with the TLD list in `config/tlds.json` to probe all combinations.
 
+Direct, known-good mirrors can be added to `config/seed_mirrors.json` (health-checked immediately on the next run).
+
+### Denylist
+
+The torrent-mirror space is full of scam/phishing/malware sites that impersonate these indexers — and some `base.tld` combinations collide with documented impersonators that mimic the real layout closely enough to pass the fingerprint check. `config/denylist.json` lists hosts that discovery must **never** probe or add. Add to it when a clone is identified.
+
+> **Note:** TorrentGalaxy went dark in early 2025 and appears defunct; every site currently serving a "TorrentGalaxy" page is a clone. Its canonical domains are still seeded so the monitor will notice if it ever returns, but expect them to read as `Dead`/`GeoRestricted`.
+
 ## Development
 
 ```bash

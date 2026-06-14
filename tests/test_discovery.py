@@ -171,6 +171,35 @@ class TestDiscoverMirrors:
         assert len(mirrors) == 0
 
     @respx.mock
+    async def test_skips_denylisted_domain(self):
+        """A denylisted base.tld is never resolved or probed."""
+        state = MirrorState()
+        async with httpx.AsyncClient() as doh_client, httpx.AsyncClient() as probe_client:
+            mirrors = await discover_mirrors(
+                "rutracker", ["rutracker"], ["me"], state, doh_client, probe_client,
+                denylist={"rutracker.me"},
+            )
+        assert mirrors == []
+        assert len(respx.calls) == 0  # denied before any DNS/HTTP traffic
+
+    @respx.mock
+    async def test_denylist_filters_subset(self):
+        """Only the denylisted combo is dropped; others still discovered."""
+        respx.get(DOH_CLOUDFLARE).mock(return_value=httpx.Response(200, json=DOH_SUCCESS))
+        respx.get("https://good.to/").mock(
+            return_value=httpx.Response(200, text="<html>" + "x" * 200 + "</html>")
+        )
+        state = MirrorState()
+        async with httpx.AsyncClient() as doh_client, httpx.AsyncClient() as probe_client:
+            mirrors = await discover_mirrors(
+                "s", ["good", "bad"], ["to"], state, doh_client, probe_client,
+                denylist={"bad.to"},
+            )
+        urls = {m.url for m in mirrors}
+        assert "https://good.to" in urls
+        assert "https://bad.to" not in urls
+
+    @respx.mock
     async def test_multiple_base_names_and_tlds(self):
         """Multiple combinations are probed."""
         # Both resolve
