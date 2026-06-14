@@ -200,6 +200,101 @@ class TestCheckMirror:
         assert m.tier == Tier.DEAD.value
 
 
+SUBMIT = {
+    "ok": 1,
+    "request_id": "geo1",
+    "nodes": {
+        "us1.node.check-host.net": ["North America", "us", "LA"],
+        "de1.node.check-host.net": ["Europe", "de", "Falkenstein"],
+    },
+}
+_OK = [[1, 0.3, "OK", "200", "2.2.2.2"]]
+_FAIL = [[0, 5.0, "Timed out"]]
+
+GEO_CONFIG = {
+    "enabled": True,
+    "max_nodes": 10,
+    "poll_attempts": 2,
+    "poll_interval_seconds": 0,
+    "recheck_cooldown_hours": 24,
+    "min_nodes_per_region": 1,
+    "recheck_failure_reasons": ["timeout", "server_error", "connect_error"],
+    "regions": {"US": ["us"], "EU": ["de", "nl", "fr"]},
+}
+
+
+class TestGeoRestrictionInCheckMirror:
+    @respx.mock
+    async def test_failing_but_reachable_elsewhere_becomes_geo_restricted(self):
+        # US check fails (timeout = geo-plausible); check-host shows DE reachable.
+        respx.get("https://blocked.com/").mock(side_effect=httpx.ReadTimeout("timeout"))
+        respx.get(url__regex=r"https://check-host\.net/check-http").mock(
+            return_value=httpx.Response(200, json=SUBMIT)
+        )
+        respx.get(url__regex=r"https://check-host\.net/check-result/.+").mock(
+            return_value=httpx.Response(200, json={
+                "us1.node.check-host.net": _FAIL,
+                "de1.node.check-host.net": _OK,
+            })
+        )
+        m = Mirror(url="https://blocked.com", scraper="s", tier=Tier.ALIVE, consecutive_fails=4)
+        from src.geo import GeoBudget
+        async with httpx.AsyncClient() as client:
+            await check_mirror(m, None, client, SCORING_CONFIG, run_full=False,
+                               geo_config=GEO_CONFIG, geo_budget=GeoBudget(5))
+        assert m.tier == Tier.GEO_RESTRICTED.value
+        assert m.geo_reachable_regions == ["EU"]
+        assert m.geo_checked_at is not None
+        assert m.fallen_comrade is False  # geo block doesn't earn the FC badge
+
+    @respx.mock
+    async def test_failing_and_unreachable_everywhere_becomes_dead(self):
+        respx.get("https://gone.com/").mock(side_effect=httpx.ReadTimeout("timeout"))
+        respx.get(url__regex=r"https://check-host\.net/check-http").mock(
+            return_value=httpx.Response(200, json=SUBMIT)
+        )
+        respx.get(url__regex=r"https://check-host\.net/check-result/.+").mock(
+            return_value=httpx.Response(200, json={
+                "us1.node.check-host.net": _FAIL,
+                "de1.node.check-host.net": _FAIL,
+            })
+        )
+        m = Mirror(url="https://gone.com", scraper="s", tier=Tier.ALIVE, consecutive_fails=4)
+        from src.geo import GeoBudget
+        async with httpx.AsyncClient() as client:
+            await check_mirror(m, None, client, SCORING_CONFIG, run_full=False,
+                               geo_config=GEO_CONFIG, geo_budget=GeoBudget(5))
+        assert m.tier == Tier.DEAD.value
+        assert m.geo_reachable_regions == []
+
+    @respx.mock
+    async def test_non_geo_reason_skips_recheck(self):
+        # dns_failure is not a geo-plausible reason -> no check-host call -> Dead.
+        respx.get("https://dns.com/").mock(
+            side_effect=httpx.ConnectError("Name or service not known")
+        )
+        m = Mirror(url="https://dns.com", scraper="s", tier=Tier.ALIVE, consecutive_fails=4)
+        from src.geo import GeoBudget
+        async with httpx.AsyncClient() as client:
+            await check_mirror(m, None, client, SCORING_CONFIG, run_full=False,
+                               geo_config=GEO_CONFIG, geo_budget=GeoBudget(5))
+        assert m.tier == Tier.DEAD.value
+        assert m.geo_checked_at is None  # never rechecked
+
+    @respx.mock
+    async def test_geo_restricted_resurrects_when_us_passes(self):
+        respx.get("https://back.com/").mock(
+            return_value=httpx.Response(200, text="<html>" + "x" * 200 + "</html>")
+        )
+        m = Mirror(url="https://back.com", scraper="s", tier=Tier.GEO_RESTRICTED,
+                   consecutive_fails=8, geo_reachable_regions=["EU"])
+        async with httpx.AsyncClient() as client:
+            await check_mirror(m, None, client, SCORING_CONFIG, run_full=False,
+                               geo_config=GEO_CONFIG, geo_budget=None)
+        assert m.tier == Tier.CANDIDATE.value
+        assert m.geo_reachable_regions == []  # cleared on US pass
+
+
 class TestErrorIsolation:
     @respx.mock
     async def test_bad_mirror_doesnt_crash_scraper_group(self):

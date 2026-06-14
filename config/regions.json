@@ -1,0 +1,23 @@
+{
+  "enabled": true,
+  "max_nodes": 10,
+  "poll_attempts": 4,
+  "poll_interval_seconds": 1.5,
+  "per_run_recheck_cap": 15,
+  "recheck_cooldown_hours": 24,
+  "min_nodes_per_region": 1,
+  "recheck_failure_reasons": [
+    "timeout",
+    "connect_error",
+    "connection_refused",
+    "rate_limited",
+    "server_error"
+  ],
+  "regions": {
+    "US": ["us"],
+    "EU": ["de", "nl", "fr", "gb", "uk", "es", "it", "pl", "se", "fi", "ch", "cz", "ru", "ua", "at", "ie", "pt", "ro", "bg", "rs", "md", "lv", "lt", "ee", "hu", "gr", "no", "dk", "be", "sk", "si"],
+    "ASIA": ["jp", "kr", "cn", "hk", "sg", "in", "tw", "th", "vn", "id", "il", "tr", "ae", "kz", "ir"],
+    "SA": ["br", "ar", "cl", "co", "pe"],
+    "OCEANIA": ["au", "nz"]
+  }
+}
