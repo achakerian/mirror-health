@@ -15,7 +15,11 @@ permissions:
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    # The active check probes every Candidate/Alive/GOAT mirror with 1-5s polite
+    # delays (~200 mirrors), so 5 min was always hit -> the job was cancelled
+    # before it could commit, freezing promotions (yts/torrentgalaxy/rutracker
+    # never left Candidate). Give it room to finish and push.
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
