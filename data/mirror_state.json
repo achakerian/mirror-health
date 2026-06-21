@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-06-21T03:43:17.328643Z",
+  "generated_at": "2026-06-21T08:02:27.716522Z",
   "runner_geo": {
-    "ip": "135.119.239.129",
+    "ip": "20.109.95.163",
     "city": "Boydton",
     "region": "Virginia",
     "country": "US",
@@ -8867,6 +8867,37 @@
         490.46702799999764,
         506.5736220000048
       ]
+    },
+    {
+      "url": "https://1337x.me",
+      "scraper": "1337x",
+      "tier": "Candidate",
+      "fallen_comrade": false,
+      "score": 0.0,
+      "decayed_passes": 0.0,
+      "decayed_fails": 0.0,
+      "decay_updated_at": null,
+      "avg_response_ms": 0.0,
+      "consecutive_fails": 0,
+      "consecutive_passes": 0,
+      "total_checks": 0,
+      "total_passes": 0,
+      "last_checked": null,
+      "last_passed": null,
+      "last_failed": null,
+      "first_seen": "2026-06-21T07:58:27.265434Z",
+      "cloudflare_detected": false,
+      "geo_checked_at": null,
+      "geo_reachable_regions": [],
+      "last_failure_reason": null,
+      "check_history_7d": {
+        "basic_total": 0,
+        "basic_passed": 0,
+        "full_total": 0,
+        "full_passed": 0,
+        "window_start": null
+      },
+      "response_times": []
     }
   ]
 }
