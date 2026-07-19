@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-07-19T02:18:21.452371Z",
+  "generated_at": "2026-07-19T05:53:40.551942Z",
   "runner_geo": {
-    "ip": "135.119.95.48",
-    "city": "Des Moines",
-    "region": "Iowa",
+    "ip": "52.161.69.161",
+    "city": "Cheyenne",
+    "region": "Wyoming",
     "country": "US",
     "org": "AS8075 Microsoft Corporation",
-    "timezone": "America/Chicago"
+    "timezone": "America/Denver"
   },
   "mirrors": [
     {
@@ -9113,6 +9113,130 @@
         1468.8438529999958,
         1424.1460220000022
       ]
+    },
+    {
+      "url": "https://1377x.click",
+      "scraper": "1337x",
+      "tier": "Candidate",
+      "fallen_comrade": false,
+      "score": 0.0,
+      "decayed_passes": 0.0,
+      "decayed_fails": 0.0,
+      "decay_updated_at": null,
+      "avg_response_ms": 0.0,
+      "consecutive_fails": 0,
+      "consecutive_passes": 0,
+      "total_checks": 0,
+      "total_passes": 0,
+      "last_checked": null,
+      "last_passed": null,
+      "last_failed": null,
+      "first_seen": "2026-07-19T05:50:49.454630Z",
+      "cloudflare_detected": false,
+      "geo_checked_at": null,
+      "geo_reachable_regions": [],
+      "last_failure_reason": null,
+      "check_history_7d": {
+        "basic_total": 0,
+        "basic_passed": 0,
+        "full_total": 0,
+        "full_passed": 0,
+        "window_start": null
+      },
+      "response_times": []
+    },
+    {
+      "url": "https://thepiratebay.nl",
+      "scraper": "tpb",
+      "tier": "Candidate",
+      "fallen_comrade": false,
+      "score": 0.0,
+      "decayed_passes": 0.0,
+      "decayed_fails": 0.0,
+      "decay_updated_at": null,
+      "avg_response_ms": 0.0,
+      "consecutive_fails": 0,
+      "consecutive_passes": 0,
+      "total_checks": 0,
+      "total_passes": 0,
+      "last_checked": null,
+      "last_passed": null,
+      "last_failed": null,
+      "first_seen": "2026-07-19T05:50:09.869004Z",
+      "cloudflare_detected": false,
+      "geo_checked_at": null,
+      "geo_reachable_regions": [],
+      "last_failure_reason": null,
+      "check_history_7d": {
+        "basic_total": 0,
+        "basic_passed": 0,
+        "full_total": 0,
+        "full_passed": 0,
+        "window_start": null
+      },
+      "response_times": []
+    },
+    {
+      "url": "https://piratebay.nl",
+      "scraper": "tpb",
+      "tier": "Candidate",
+      "fallen_comrade": false,
+      "score": 0.0,
+      "decayed_passes": 0.0,
+      "decayed_fails": 0.0,
+      "decay_updated_at": null,
+      "avg_response_ms": 0.0,
+      "consecutive_fails": 0,
+      "consecutive_passes": 0,
+      "total_checks": 0,
+      "total_passes": 0,
+      "last_checked": null,
+      "last_passed": null,
+      "last_failed": null,
+      "first_seen": "2026-07-19T05:50:54.109986Z",
+      "cloudflare_detected": false,
+      "geo_checked_at": null,
+      "geo_reachable_regions": [],
+      "last_failure_reason": null,
+      "check_history_7d": {
+        "basic_total": 0,
+        "basic_passed": 0,
+        "full_total": 0,
+        "full_passed": 0,
+        "window_start": null
+      },
+      "response_times": []
+    },
+    {
+      "url": "https://annas-archive.mx",
+      "scraper": "annas_archive",
+      "tier": "Candidate",
+      "fallen_comrade": false,
+      "score": 0.0,
+      "decayed_passes": 0.0,
+      "decayed_fails": 0.0,
+      "decay_updated_at": null,
+      "avg_response_ms": 0.0,
+      "consecutive_fails": 0,
+      "consecutive_passes": 0,
+      "total_checks": 0,
+      "total_passes": 0,
+      "last_checked": null,
+      "last_passed": null,
+      "last_failed": null,
+      "first_seen": "2026-07-19T05:49:28.940083Z",
+      "cloudflare_detected": false,
+      "geo_checked_at": null,
+      "geo_reachable_regions": [],
+      "last_failure_reason": null,
+      "check_history_7d": {
+        "basic_total": 0,
+        "basic_passed": 0,
+        "full_total": 0,
+        "full_passed": 0,
+        "window_start": null
+      },
+      "response_times": []
     }
   ]
 }
