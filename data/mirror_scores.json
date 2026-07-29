@@ -1,150 +1,150 @@
 {
-  "generated_at": "2026-07-29T02:11:02.522308Z",
+  "generated_at": "2026-07-29T06:27:36.079537Z",
   "runner_geo": {
-    "ip": "48.214.54.34",
-    "city": "Boydton",
-    "region": "Virginia",
+    "ip": "52.173.164.21",
+    "city": "Des Moines",
+    "region": "Iowa",
     "country": "US",
     "org": "AS8075 Microsoft Corporation",
-    "timezone": "America/New_York"
+    "timezone": "America/Chicago"
   },
   "scrapers": {
     "tpb": [
       {
         "url": "https://thepiratebay10.org",
         "tier": "GOAT",
-        "score": 0.9591605689797729,
-        "avg_response_ms": 346.75128829999767,
+        "score": 0.9589081524482906,
+        "avg_response_ms": 426.8387256999965,
         "fallen_comrade": false,
-        "last_checked": "2026-07-29T02:10:34.709148Z",
-        "cloudflare_detected": false
-      },
-      {
-        "url": "https://tpb.party",
-        "tier": "GOAT",
-        "score": 0.9591604100041168,
-        "avg_response_ms": 402.8529214999949,
-        "fallen_comrade": false,
-        "last_checked": "2026-07-29T02:10:31.288778Z",
+        "last_checked": "2026-07-29T06:27:13.662059Z",
         "cloudflare_detected": false
       },
       {
         "url": "https://piratebay.party",
         "tier": "GOAT",
-        "score": 0.9591602443831574,
-        "avg_response_ms": 485.8187454999993,
+        "score": 0.9589078274681616,
+        "avg_response_ms": 444.9170832999982,
         "fallen_comrade": false,
-        "last_checked": "2026-07-29T02:10:27.606017Z",
+        "last_checked": "2026-07-29T06:27:09.482466Z",
         "cloudflare_detected": false
       },
       {
         "url": "https://piratebay.live",
         "tier": "GOAT",
-        "score": 0.9591600924829906,
-        "avg_response_ms": 285.0581675000015,
+        "score": 0.9589076741270846,
+        "avg_response_ms": 283.0207564000019,
         "fallen_comrade": false,
-        "last_checked": "2026-07-29T02:10:23.970206Z",
+        "last_checked": "2026-07-29T06:27:05.022420Z",
         "cloudflare_detected": false
       },
       {
         "url": "https://thepiratebay.rocks",
         "tier": "GOAT",
-        "score": 0.9591599260803996,
-        "avg_response_ms": 478.82986149999806,
+        "score": 0.958907505805305,
+        "avg_response_ms": 529.6557900999978,
         "fallen_comrade": false,
-        "last_checked": "2026-07-29T02:10:18.701769Z",
+        "last_checked": "2026-07-29T06:26:59.460222Z",
         "cloudflare_detected": false
       },
       {
         "url": "https://thepiratebay.zone",
         "tier": "GOAT",
-        "score": 0.9591597750988305,
-        "avg_response_ms": 257.1371558000038,
+        "score": 0.9589073536613646,
+        "avg_response_ms": 255.97840690000447,
         "fallen_comrade": false,
-        "last_checked": "2026-07-29T02:10:13.473527Z",
+        "last_checked": "2026-07-29T06:26:55.562826Z",
         "cloudflare_detected": false
       },
       {
         "url": "https://thepiratebay.party",
         "tier": "GOAT",
-        "score": 0.9591596232684076,
-        "avg_response_ms": 390.22040449999906,
+        "score": 0.9589072005422161,
+        "avg_response_ms": 402.8416829000008,
         "fallen_comrade": false,
-        "last_checked": "2026-07-29T02:10:11.030616Z",
+        "last_checked": "2026-07-29T06:26:51.405677Z",
         "cloudflare_detected": false
       },
       {
         "url": "https://piratebayproxy.info",
         "tier": "GOAT",
-        "score": 0.9591564865273629,
-        "avg_response_ms": 176.16051159999984,
+        "score": 0.9589041015312252,
+        "avg_response_ms": 224.70109539999893,
         "fallen_comrade": false,
-        "last_checked": "2026-07-29T02:10:58.451775Z",
+        "last_checked": "2026-07-29T06:27:33.260536Z",
         "cloudflare_detected": false
       },
       {
         "url": "https://piratebayproxy.live",
         "tier": "GOAT",
-        "score": 0.9591563329912506,
-        "avg_response_ms": 318.01701720000176,
+        "score": 0.9589039462666048,
+        "avg_response_ms": 342.4779299000008,
         "fallen_comrade": false,
-        "last_checked": "2026-07-29T02:10:54.161043Z",
-        "cloudflare_detected": false
-      },
-      {
-        "url": "https://pirateproxy.live",
-        "tier": "GOAT",
-        "score": 0.9591561611820164,
-        "avg_response_ms": 497.8951149999986,
-        "fallen_comrade": false,
-        "last_checked": "2026-07-29T02:10:50.257166Z",
+        "last_checked": "2026-07-29T06:27:28.212578Z",
         "cloudflare_detected": false
       },
       {
         "url": "https://thepiratebay10.info",
         "tier": "GOAT",
-        "score": 0.9591560021703182,
-        "avg_response_ms": 374.56040229999843,
+        "score": 0.9589036140865788,
+        "avg_response_ms": 381.460146900001,
         "fallen_comrade": false,
-        "last_checked": "2026-07-29T02:10:47.460369Z",
+        "last_checked": "2026-07-29T06:27:22.030352Z",
         "cloudflare_detected": false
       },
       {
         "url": "https://thepiratebay10.xyz",
         "tier": "GOAT",
-        "score": 0.95915586416577,
-        "avg_response_ms": 193.6321644999964,
+        "score": 0.9589034756379291,
+        "avg_response_ms": 204.3499025999978,
         "fallen_comrade": false,
-        "last_checked": "2026-07-29T02:10:44.385900Z",
+        "last_checked": "2026-07-29T06:27:19.695229Z",
         "cloudflare_detected": false
       },
       {
         "url": "https://thepiratebay.xyz",
         "tier": "GOAT",
-        "score": 0.9591556958764876,
-        "avg_response_ms": 417.7439190000001,
+        "score": 0.9589033070581913,
+        "avg_response_ms": 460.5480807000022,
         "fallen_comrade": false,
-        "last_checked": "2026-07-29T02:10:39.376603Z",
+        "last_checked": "2026-07-29T06:27:17.346039Z",
+        "cloudflare_detected": false
+      },
+      {
+        "url": "https://tpb.party",
+        "tier": "GOAT",
+        "score": 0.9394871180430859,
+        "avg_response_ms": 402.8529214999949,
+        "fallen_comrade": false,
+        "last_checked": "2026-07-29T06:27:11.827228Z",
+        "cloudflare_detected": false
+      },
+      {
+        "url": "https://pirateproxy.live",
+        "tier": "GOAT",
+        "score": 0.9394806512824366,
+        "avg_response_ms": 497.8951149999986,
+        "fallen_comrade": false,
+        "last_checked": "2026-07-29T06:27:24.471884Z",
         "cloudflare_detected": false
       }
     ],
     "eztv": [
       {
-        "url": "https://eztv.wf",
+        "url": "https://eztv.tf",
         "tier": "GOAT",
-        "score": 0.9591596232028509,
-        "avg_response_ms": 702.5447983999987,
+        "score": 0.9547072338815812,
+        "avg_response_ms": 1300.671322499995,
         "fallen_comrade": true,
-        "last_checked": "2026-07-29T02:10:11.036106Z",
+        "last_checked": "2026-07-29T06:26:53.274130Z",
         "cloudflare_detected": false
       },
       {
-        "url": "https://eztv.tf",
+        "url": "https://eztv.wf",
         "tier": "GOAT",
-        "score": 0.9549128756262951,
-        "avg_response_ms": 1238.9308702999947,
+        "score": 0.9394863741469542,
+        "avg_response_ms": 702.5447983999987,
         "fallen_comrade": true,
-        "last_checked": "2026-07-29T02:10:12.710279Z",
+        "last_checked": "2026-07-29T06:26:51.409219Z",
         "cloudflare_detected": false
       }
     ],
@@ -152,28 +152,28 @@
       {
         "url": "https://annas-archive.pk",
         "tier": "GOAT",
-        "score": 0.9209467626155549,
-        "avg_response_ms": 761.191861999999,
+        "score": 0.9210673667348678,
+        "avg_response_ms": 773.8316582000018,
         "fallen_comrade": false,
-        "last_checked": "2026-07-29T02:10:20.588689Z",
+        "last_checked": "2026-07-29T06:27:04.583507Z",
         "cloudflare_detected": false
       },
       {
         "url": "https://annas-archive.gd",
         "tier": "GOAT",
-        "score": 0.9130049133481577,
-        "avg_response_ms": 1597.1550009000025,
+        "score": 0.9131981713382545,
+        "avg_response_ms": 1568.8854180000021,
         "fallen_comrade": false,
-        "last_checked": "2026-07-29T02:10:11.036641Z",
+        "last_checked": "2026-07-29T06:26:51.409602Z",
         "cloudflare_detected": false
       },
       {
         "url": "https://annas-archive.gl",
         "tier": "GOAT",
-        "score": 0.8934212327990526,
-        "avg_response_ms": 821.6672841000003,
+        "score": 0.8937933247737189,
+        "avg_response_ms": 1013.6792878000036,
         "fallen_comrade": false,
-        "last_checked": "2026-07-29T02:10:14.701352Z",
+        "last_checked": "2026-07-29T06:26:57.560606Z",
         "cloudflare_detected": false
       }
     ]
