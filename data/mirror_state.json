@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-08-09T03:30:06.865548Z",
+  "generated_at": "2026-08-09T04:20:17.659690Z",
   "runner_geo": {
-    "ip": "172.184.213.178",
-    "city": "San Jose",
-    "region": "California",
+    "ip": "20.119.103.0",
+    "city": "Dulles Town Center",
+    "region": "Virginia",
     "country": "US",
     "org": "AS8075 Microsoft Corporation",
-    "timezone": "America/Los_Angeles"
+    "timezone": "America/New_York"
   },
   "mirrors": [
     {
@@ -9409,6 +9409,68 @@
         753.1227250000043,
         1217.1299140000044
       ]
+    },
+    {
+      "url": "https://rutracker.pro",
+      "scraper": "rutracker",
+      "tier": "Candidate",
+      "fallen_comrade": false,
+      "score": 0.0,
+      "decayed_passes": 0.0,
+      "decayed_fails": 0.0,
+      "decay_updated_at": null,
+      "avg_response_ms": 0.0,
+      "consecutive_fails": 0,
+      "consecutive_passes": 0,
+      "total_checks": 0,
+      "total_passes": 0,
+      "last_checked": null,
+      "last_passed": null,
+      "last_failed": null,
+      "first_seen": "2026-08-09T04:15:53.521203Z",
+      "cloudflare_detected": false,
+      "geo_checked_at": null,
+      "geo_reachable_regions": [],
+      "last_failure_reason": null,
+      "check_history_7d": {
+        "basic_total": 0,
+        "basic_passed": 0,
+        "full_total": 0,
+        "full_passed": 0,
+        "window_start": null
+      },
+      "response_times": []
+    },
+    {
+      "url": "https://rutracker.xyz",
+      "scraper": "rutracker",
+      "tier": "Candidate",
+      "fallen_comrade": false,
+      "score": 0.0,
+      "decayed_passes": 0.0,
+      "decayed_fails": 0.0,
+      "decay_updated_at": null,
+      "avg_response_ms": 0.0,
+      "consecutive_fails": 0,
+      "consecutive_passes": 0,
+      "total_checks": 0,
+      "total_passes": 0,
+      "last_checked": null,
+      "last_passed": null,
+      "last_failed": null,
+      "first_seen": "2026-08-09T04:16:00.119050Z",
+      "cloudflare_detected": false,
+      "geo_checked_at": null,
+      "geo_reachable_regions": [],
+      "last_failure_reason": null,
+      "check_history_7d": {
+        "basic_total": 0,
+        "basic_passed": 0,
+        "full_total": 0,
+        "full_passed": 0,
+        "window_start": null
+      },
+      "response_times": []
     }
   ]
 }
