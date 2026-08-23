@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-08-23T02:58:08.797301Z",
+  "generated_at": "2026-08-23T03:51:34.204537Z",
   "runner_geo": {
-    "ip": "20.171.51.214",
-    "city": "Phoenix",
-    "region": "Arizona",
+    "ip": "20.118.213.19",
+    "city": "Des Moines",
+    "region": "Iowa",
     "country": "US",
     "org": "AS8075 Microsoft Corporation",
-    "timezone": "America/Phoenix"
+    "timezone": "America/Chicago"
   },
   "mirrors": [
     {
@@ -9526,6 +9526,68 @@
         1342.7756589999972,
         948.8726400000012
       ]
+    },
+    {
+      "url": "https://1337xx.org",
+      "scraper": "1337x",
+      "tier": "Candidate",
+      "fallen_comrade": false,
+      "score": 0.0,
+      "decayed_passes": 0.0,
+      "decayed_fails": 0.0,
+      "decay_updated_at": null,
+      "avg_response_ms": 0.0,
+      "consecutive_fails": 0,
+      "consecutive_passes": 0,
+      "total_checks": 0,
+      "total_passes": 0,
+      "last_checked": null,
+      "last_passed": null,
+      "last_failed": null,
+      "first_seen": "2026-08-23T03:48:08.402689Z",
+      "cloudflare_detected": false,
+      "geo_checked_at": null,
+      "geo_reachable_regions": [],
+      "last_failure_reason": null,
+      "check_history_7d": {
+        "basic_total": 0,
+        "basic_passed": 0,
+        "full_total": 0,
+        "full_passed": 0,
+        "window_start": null
+      },
+      "response_times": []
+    },
+    {
+      "url": "https://pirateproxy.org",
+      "scraper": "tpb",
+      "tier": "Candidate",
+      "fallen_comrade": false,
+      "score": 0.0,
+      "decayed_passes": 0.0,
+      "decayed_fails": 0.0,
+      "decay_updated_at": null,
+      "avg_response_ms": 0.0,
+      "consecutive_fails": 0,
+      "consecutive_passes": 0,
+      "total_checks": 0,
+      "total_passes": 0,
+      "last_checked": null,
+      "last_passed": null,
+      "last_failed": null,
+      "first_seen": "2026-08-23T03:50:04.428788Z",
+      "cloudflare_detected": false,
+      "geo_checked_at": null,
+      "geo_reachable_regions": [],
+      "last_failure_reason": null,
+      "check_history_7d": {
+        "basic_total": 0,
+        "basic_passed": 0,
+        "full_total": 0,
+        "full_passed": 0,
+        "window_start": null
+      },
+      "response_times": []
     }
   ]
 }
