@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-09-06T02:40:01.812189Z",
+  "generated_at": "2026-09-06T07:41:33.035174Z",
   "runner_geo": {
-    "ip": "172.182.201.162",
-    "city": "Phoenix",
-    "region": "Arizona",
+    "ip": "20.83.158.128",
+    "city": "Dulles Town Center",
+    "region": "Virginia",
     "country": "US",
     "org": "AS8075 Microsoft Corporation",
-    "timezone": "America/Phoenix"
+    "timezone": "America/New_York"
   },
   "mirrors": [
     {
@@ -9637,6 +9637,37 @@
         135.8579410000118,
         216.24765800000034
       ]
+    },
+    {
+      "url": "https://yify.cc",
+      "scraper": "yts",
+      "tier": "Candidate",
+      "fallen_comrade": false,
+      "score": 0.0,
+      "decayed_passes": 0.0,
+      "decayed_fails": 0.0,
+      "decay_updated_at": null,
+      "avg_response_ms": 0.0,
+      "consecutive_fails": 0,
+      "consecutive_passes": 0,
+      "total_checks": 0,
+      "total_passes": 0,
+      "last_checked": null,
+      "last_passed": null,
+      "last_failed": null,
+      "first_seen": "2026-09-06T07:38:10.216932Z",
+      "cloudflare_detected": false,
+      "geo_checked_at": null,
+      "geo_reachable_regions": [],
+      "last_failure_reason": null,
+      "check_history_7d": {
+        "basic_total": 0,
+        "basic_passed": 0,
+        "full_total": 0,
+        "full_passed": 0,
+        "window_start": null
+      },
+      "response_times": []
     }
   ]
 }
