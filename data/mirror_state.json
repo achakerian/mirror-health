@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-11-15T08:46:18.301412Z",
+  "generated_at": "2026-11-15T10:27:02.587557Z",
   "runner_geo": {
-    "ip": "3.41.210.70",
-    "city": "Ashburn",
+    "ip": "172.174.157.131",
+    "city": "Dulles Town Center",
     "region": "Virginia",
     "country": "US",
-    "org": "AS14618 Amazon.com, Inc.",
+    "org": "AS8075 Microsoft Corporation",
     "timezone": "America/New_York"
   },
   "mirrors": [
@@ -10150,6 +10150,68 @@
         1335.0682020000022,
         2852.4087769999937
       ]
+    },
+    {
+      "url": "https://pirateproxy.eu",
+      "scraper": "tpb",
+      "tier": "Candidate",
+      "fallen_comrade": false,
+      "score": 0.0,
+      "decayed_passes": 0.0,
+      "decayed_fails": 0.0,
+      "decay_updated_at": null,
+      "avg_response_ms": 0.0,
+      "consecutive_fails": 0,
+      "consecutive_passes": 0,
+      "total_checks": 0,
+      "total_passes": 0,
+      "last_checked": null,
+      "last_passed": null,
+      "last_failed": null,
+      "first_seen": "2026-11-15T10:25:38.695813Z",
+      "cloudflare_detected": false,
+      "geo_checked_at": null,
+      "geo_reachable_regions": [],
+      "last_failure_reason": null,
+      "check_history_7d": {
+        "basic_total": 0,
+        "basic_passed": 0,
+        "full_total": 0,
+        "full_passed": 0,
+        "window_start": null
+      },
+      "response_times": []
+    },
+    {
+      "url": "https://tgx.si",
+      "scraper": "torrentgalaxy",
+      "tier": "Candidate",
+      "fallen_comrade": false,
+      "score": 0.0,
+      "decayed_passes": 0.0,
+      "decayed_fails": 0.0,
+      "decay_updated_at": null,
+      "avg_response_ms": 0.0,
+      "consecutive_fails": 0,
+      "consecutive_passes": 0,
+      "total_checks": 0,
+      "total_passes": 0,
+      "last_checked": null,
+      "last_passed": null,
+      "last_failed": null,
+      "first_seen": "2026-11-15T10:23:39.154744Z",
+      "cloudflare_detected": false,
+      "geo_checked_at": null,
+      "geo_reachable_regions": [],
+      "last_failure_reason": null,
+      "check_history_7d": {
+        "basic_total": 0,
+        "basic_passed": 0,
+        "full_total": 0,
+        "full_passed": 0,
+        "window_start": null
+      },
+      "response_times": []
     }
   ]
 }
