@@ -25,9 +25,9 @@
   },
   "eztv": {
     "name": "EZTV",
-    "fingerprint_type": "html_contains",
-    "fingerprint_path": "/",
-    "fingerprint_check": "forum_header_border"
+    "fingerprint_type": "json_api",
+    "fingerprint_path": "/api/get-torrents?limit=1",
+    "fingerprint_check": ["torrents"]
   },
   "annas_archive": {
     "name": "Anna's Archive",
